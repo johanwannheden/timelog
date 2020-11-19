@@ -3,6 +3,8 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {LogEntryModification, ModificationKind} from '../model/log-entry.modification';
 import {LogEntry} from '../model/log-entry';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {endTimeIsAfterStartTime, workingDateNotAfter} from '../shared/dialog-validators.directive';
+import {TIME_FORMAT} from '../shared/minute-of-day';
 
 @Component({
     selector: 'app-create-log-entry',
@@ -10,10 +12,6 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
     styleUrls: ['./log-entry-dialog.component.css']
 })
 export class LogEntryDialogComponent implements OnInit {
-
-    // dateControl: FormControl;
-    // startTimeControl: FormControl;
-    // endTimeControl: FormControl;
 
     formGroup: FormGroup | undefined;
 
@@ -31,9 +29,11 @@ export class LogEntryDialogComponent implements OnInit {
 
     ngOnInit(): void {
         this.formGroup = this.formBuilder.group({
-            date: [new Date(), [Validators.required]],
-            startTime: ['', [Validators.required, Validators.pattern(/\d{1,2}(:\d{2})?/)]],
-            endTime: ['', [Validators.required, Validators.pattern(/\d{1,2}(:\d{2})?/)]],
+            date: [new Date(), [Validators.required, workingDateNotAfter(new Date())]],
+            startTime: ['', [Validators.required, Validators.pattern(TIME_FORMAT)]],
+            endTime: ['', [Validators.required, Validators.pattern(TIME_FORMAT)]],
+        }, {
+            validators: endTimeIsAfterStartTime
         });
     }
 
