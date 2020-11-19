@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import {LogListComponent} from './log-list-component/log-list.component';
-import {CreateLogEntryComponent} from './create-log-entry/create-log-entry.component';
+import {LogEntryDialogComponent} from './log-entry-dialog/log-entry-dialog.component';
 
 const routes: Routes = [
   {
-    path: 'list',
-    component: LogListComponent
+    path: 'create',
+    component: LogEntryDialogComponent
   },
   {
-    path: 'create',
-    component: CreateLogEntryComponent
+    path: '',
+    component: LogListComponent
   },
 ];
 

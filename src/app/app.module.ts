@@ -31,15 +31,16 @@ import {MatNativeDateModule} from '@angular/material/core';
 import {MatDialogModule} from '@angular/material/dialog';
 import {LogDatePipe} from './pipe/log-date.pipe';
 import {LogDurationPipe} from './pipe/log-duration.pipe';
-import { CreateLogEntryComponent } from './create-log-entry/create-log-entry.component';
+import { LogEntryDialogComponent } from './log-entry-dialog/log-entry-dialog.component';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
     declarations: [
         AppComponent,
         LogListComponent,
+        LogEntryDialogComponent,
         LogDatePipe,
         LogDurationPipe,
-        CreateLogEntryComponent
     ],
     imports: [
         BrowserAnimationsModule,
@@ -69,7 +70,9 @@ import { CreateLogEntryComponent } from './create-log-entry/create-log-entry.com
         MatExpansionModule,
         MatDatepickerModule,
         MatNativeDateModule,
-        MatDialogModule
+        MatDialogModule,
+        FormsModule,
+        ReactiveFormsModule
     ],
     providers: [],
     bootstrap: [AppComponent]

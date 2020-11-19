@@ -3,6 +3,9 @@ import {MatTableDataSource} from '@angular/material/table';
 import {LogEntry} from '../model/log-entry';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
+import {MatDialog} from '@angular/material/dialog';
+import {LogEntryDialogComponent} from '../log-entry-dialog/log-entry-dialog.component';
+import {ModificationKind} from '../model/log-entry.modification';
 
 @Component({
     selector: 'app-log-list-component',
@@ -10,6 +13,8 @@ import {MatPaginator} from '@angular/material/paginator';
     styleUrls: ['./log-list.component.css']
 })
 export class LogListComponent implements OnInit, AfterViewInit {
+
+    add = ModificationKind.Add;
 
     public displayedColumns = ['date', 'duration', 'comment', 'update', 'delete'];
     public dataSource = new MatTableDataSource<LogEntry>();
@@ -19,7 +24,7 @@ export class LogListComponent implements OnInit, AfterViewInit {
     // @ts-ignore
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
-    constructor() {
+    constructor(public dialog: MatDialog) {
     }
 
     ngOnInit(): void {
@@ -39,6 +44,25 @@ export class LogListComponent implements OnInit, AfterViewInit {
             return false;
         });
     }
+
+    openDialog(kind: ModificationKind, data?: LogEntry): void {
+        const dialogRef = this.dialog.open(LogEntryDialogComponent, {
+            width: '250px',
+            data: {kind, data}
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            // if (result.event == 'Add') {
+            //     this.addRowData(result.data);
+            // } else if (result.event == 'Update') {
+            //     this.updateRowData(result.data);
+            // } else if (result.event == 'Delete') {
+            //     this.deleteRowData(result.data);
+            // }
+            console.log('>> close');
+        });
+    }
+
 
     ngAfterViewInit(): void {
         this.dataSource.sort = this.sort;

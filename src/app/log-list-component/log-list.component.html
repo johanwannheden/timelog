@@ -1,11 +1,6 @@
-<div fxLayout fxLayout.lt-md="column wrap" fxLayoutAlign="center center" fxLayoutGap.gt-sm="250px"
+<div fxLayout fxLayout.lt-md="column wrap" fxLayoutAlign="end end" fxLayoutGap.gt-sm="250px"
      fxLayoutGap.lt-md="20px">
-    <mat-form-field fxFlex="40%">
-        <input matInput type="text" (keyup)="doFilter($event.target)" placeholder="Filter">
-    </mat-form-field>
-    <div>
-        <a [routerLink]="['/create']" mat-button color="primary">Log time</a>
-    </div>
+    <button mat-button (click)="openDialog(add)" mat-flat-button color="primary">Add Row</button>
 </div>
 <table mat-table [dataSource]="dataSource" matSort matSortStart="desc" (matSortChange)="customSort($event)">
     <ng-container matColumnDef="date">
