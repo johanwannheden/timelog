@@ -3,7 +3,7 @@ import {Duration} from '../model/duration';
 
 @Pipe({name: 'logDuration'})
 export class LogDurationPipe implements PipeTransform {
-    transform(value: Duration, ...args: any[]): string {
+    transform(value: Duration): string {
         if (!value) {
             return '';
         }

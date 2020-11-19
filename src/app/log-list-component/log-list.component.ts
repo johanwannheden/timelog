@@ -38,10 +38,7 @@ export class LogListComponent implements OnInit, AfterViewInit {
         this.dataSource.data = [sample];
 
         this.dataSource.filterPredicate = ((data, filter) => {
-            if (data?.comment?.includes(filter)) {
-                return true;
-            }
-            return false;
+            return !!data?.comment?.includes(filter);
         });
     }
 

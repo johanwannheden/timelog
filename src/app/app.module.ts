@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import { CommonModule } from '@angular/common';
+import {CommonModule} from '@angular/common';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
@@ -23,7 +23,7 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {MatCardActions, MatCardModule} from '@angular/material/card';
+import {MatCardModule} from '@angular/material/card';
 import {MatSelectModule} from '@angular/material/select';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatDatepickerModule} from '@angular/material/datepicker';
@@ -31,7 +31,7 @@ import {MatNativeDateModule} from '@angular/material/core';
 import {MatDialogModule} from '@angular/material/dialog';
 import {LogDatePipe} from './pipe/log-date.pipe';
 import {LogDurationPipe} from './pipe/log-duration.pipe';
-import { LogEntryDialogComponent } from './log-entry-dialog/log-entry-dialog.component';
+import {LogEntryDialogComponent} from './log-entry-dialog/log-entry-dialog.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
