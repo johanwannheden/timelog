@@ -1,4 +1,5 @@
 import {TimeOfDay} from '../model/time-of-day.model';
+import {Duration} from '../model/duration';
 
 export const TIME_FORMAT = /^([0-2][0-9])([:.-]?([0-5][0-9]))?$/;
 
@@ -70,3 +71,11 @@ export function getDefaultEndTime(day: DAY_OF_WEEK = getCurrentDayOfWeek()): str
     }
     return '';
 }
+
+export function getDuration(startTime: TimeOfDay, endTime: TimeOfDay): Duration {
+    return {
+        hours: endTime.hour - startTime.hour,
+        minutes: endTime.minute - startTime.minute
+    };
+}
+
