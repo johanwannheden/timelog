@@ -1,5 +1,5 @@
 import {AbstractControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
-import {minuteOfDay} from './minute-of-day';
+import {getMinuteOfDay, isValidFormat} from './time-utils';
 
 export function workingDateNotAfter(value: Date): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
@@ -16,8 +16,12 @@ export function endTimeIsAfterStartTime(control: AbstractControl): ValidationErr
         const startTime = fg.get('startTime')?.value as string;
         const endTime = fg.get('endTime')?.value as string;
 
-        const startMinute = minuteOfDay(startTime);
-        const endMinute = minuteOfDay(endTime);
+        if (!(isValidFormat(startTime) && isValidFormat(endTime))) {
+            return null;
+        }
+
+        const startMinute = getMinuteOfDay(startTime);
+        const endMinute = getMinuteOfDay(endTime);
 
         if (startMinute > endMinute) {
             return {invalidEndTime: {value: endTime}};
