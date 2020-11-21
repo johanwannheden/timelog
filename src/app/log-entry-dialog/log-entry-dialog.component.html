@@ -21,6 +21,9 @@
             formGroup.invalid">
             Start time is before end time
         </mat-error>
+        <mat-form-field>
+            <textarea matInput placeholder="Comment" formControlName='comment'></textarea>
+        </mat-form-field>
     </form>
     <div mat-dialog-actions>
         <button mat-button [disabled]="!fg.valid" (click)="doAction()" mat-flat-button

@@ -32,6 +32,7 @@ export class LogEntryDialogComponent implements OnInit {
             date: [new Date(), [Validators.required, workingDateNotAfter(new Date())]],
             startTime: [getDefaultStartTime(), [Validators.required, Validators.pattern(TIME_FORMAT)]],
             endTime: [getDefaultEndTime(), [Validators.required, Validators.pattern(TIME_FORMAT)]],
+            comment: ['']
         }, {
             validators: endTimeIsAfterStartTime
         });
