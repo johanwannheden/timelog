@@ -56,7 +56,7 @@ export class LogListComponent implements OnInit, AfterViewInit {
             // } else if (result.event == 'Delete') {
             //     this.deleteRowData(result.data);
             // }
-            console.log('>> close');
+            console.log('>> close', result);
         });
     }
 
