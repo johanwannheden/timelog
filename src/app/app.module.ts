@@ -5,6 +5,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
+import { StoreModule } from '@ngrx/store';
 
 @NgModule({
     declarations: [
@@ -15,6 +16,8 @@ import {MAT_DATE_LOCALE} from '@angular/material/core';
         BrowserModule,
 
         AppRoutingModule,
+
+        StoreModule.forRoot({}, {}),
     ],
     providers: [
         {provide: MAT_DATE_LOCALE, useValue: 'de-CH'}
