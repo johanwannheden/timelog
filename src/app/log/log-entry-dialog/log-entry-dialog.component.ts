@@ -1,11 +1,11 @@
 import {Component, Inject, OnInit, Optional} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {LogEntryModification, ModificationKind} from '../model/log-entry.modification';
-import {LogEntry} from '../model/log-entry';
+import {LogEntryModification, ModificationKind} from '../../model/log-entry.modification';
+import {LogEntry} from '../../model/log-entry';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {endTimeIsAfterStartTime, workingDateNotAfter} from '../shared/dialog-validators.directive';
-import {getDefaultEndTime, getDefaultStartTime, getTimeOfDay, TIME_FORMAT} from '../shared/time-utils';
-import {DialogEntry} from '../model/dialog-entry.model';
+import {endTimeIsAfterStartTime, workingDateNotAfter} from '../../shared/dialog-validators.directive';
+import {getDefaultEndTime, getDefaultStartTime, getTimeOfDay, TIME_FORMAT} from '../../shared/time-utils';
+import {DialogEntry} from '../../model/dialog-entry.model';
 
 @Component({
     selector: 'app-create-log-entry',

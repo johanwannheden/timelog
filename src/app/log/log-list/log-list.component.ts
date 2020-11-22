@@ -1,13 +1,13 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
-import {LogEntry} from '../model/log-entry';
+import {LogEntry} from '../../model/log-entry';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {LogEntryDialogComponent} from '../log-entry-dialog/log-entry-dialog.component';
-import {ModificationKind} from '../model/log-entry.modification';
-import {DialogEntry} from '../model/dialog-entry.model';
-import {getDuration} from '../shared/time-utils';
+import {ModificationKind} from '../../model/log-entry.modification';
+import {DialogEntry} from '../../model/dialog-entry.model';
+import {getDuration} from '../../shared/time-utils';
 
 @Component({
     selector: 'app-log-list-component',
@@ -51,13 +51,6 @@ export class LogListComponent implements OnInit, AfterViewInit {
         });
 
         dialogRef.afterClosed().subscribe((result: DialogEntry) => {
-            // if (result.event == 'Add') {
-            //     this.addRowData(result.data);
-            // } else if (result.event == 'Update') {
-            //     this.updateRowData(result.data);
-            // } else if (result.event == 'Delete') {
-            //     this.deleteRowData(result.data);
-            // }
             const newEntry: LogEntry = {
                 date: result.date,
                 dateAdded: result.date,

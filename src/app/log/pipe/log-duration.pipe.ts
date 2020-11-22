@@ -1,5 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {Duration} from '../model/duration';
+import {Duration} from '../../model/duration';
 
 @Pipe({name: 'logDuration'})
 export class LogDurationPipe implements PipeTransform {

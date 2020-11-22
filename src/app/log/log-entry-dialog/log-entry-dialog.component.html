@@ -2,17 +2,17 @@
 <ng-container *ngIf="formGroup as fg">
     <form [formGroup]="fg">
         <mat-form-field>
-            <input matInput [matDatepicker]="picker" placeholder="Date" formControlName='date'>
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <input [matDatepicker]="picker" formControlName='date' matInput placeholder="Date">
+            <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
             <mat-error *ngIf="formGroup.get('date')?.invalid">Date must not be in the future</mat-error>
         </mat-form-field>
         <mat-form-field>
-            <input matInput placeholder="Start time" formControlName='startTime'>
+            <input formControlName='startTime' matInput placeholder="Start time">
             <mat-error *ngIf="formGroup.get('startTime')?.invalid">Invalid start time</mat-error>
         </mat-form-field>
         <mat-form-field>
-            <input matInput placeholder="End time" formControlName='endTime'>
+            <input formControlName='endTime' matInput placeholder="End time">
             <mat-error *ngIf="formGroup.get('endTime')?.invalid">Invalid end time</mat-error>
         </mat-form-field>
         <mat-error *ngIf="
@@ -22,12 +22,12 @@
             Start time is before end time
         </mat-error>
         <mat-form-field>
-            <textarea matInput placeholder="Comment" formControlName='comment'></textarea>
+            <textarea formControlName='comment' matInput placeholder="Comment"></textarea>
         </mat-form-field>
     </form>
     <div mat-dialog-actions>
-        <button mat-button [disabled]="!fg.valid" (click)="doAction()" mat-flat-button
-                color="primary">{{action}}</button>
-        <button mat-button (click)="closeDialog()" mat-flat-button color="warn">Cancel</button>
+        <button (click)="doAction()" [disabled]="!fg.valid" color="primary" mat-button
+                mat-flat-button>{{action}}</button>
+        <button (click)="closeDialog()" color="warn" mat-button mat-flat-button>Cancel</button>
     </div>
 </ng-container>

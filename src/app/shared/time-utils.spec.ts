@@ -1,4 +1,4 @@
-import {DAY_OF_WEEK, getCurrentDayOfWeek, getTimeOfDay, isValidFormat, getMinuteOfDay} from './time-utils';
+import {DAY_OF_WEEK, getCurrentDayOfWeek, getMinuteOfDay, getTimeOfDay, isValidFormat} from './time-utils';
 
 describe('Tests Time Util Functions', () => {
     describe('Get Current Day of Week', () => {
