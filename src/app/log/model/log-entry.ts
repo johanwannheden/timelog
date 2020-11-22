@@ -1,4 +1,4 @@
-import {Duration} from './duration';
+import {Duration} from '../../model/duration';
 
 export interface LogEntry {
     date: Date;

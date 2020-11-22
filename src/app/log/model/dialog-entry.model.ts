@@ -1,4 +1,4 @@
-import {TimeOfDay} from './time-of-day.model';
+import {TimeOfDay} from '../../model/time-of-day.model';
 
 export interface DialogEntry {
     date: Date;

@@ -1,12 +1,12 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
-import {LogEntry} from '../../model/log-entry';
+import {LogEntry} from '../model/log-entry';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {LogEntryDialogComponent} from '../log-entry-dialog/log-entry-dialog.component';
-import {ModificationKind} from '../../model/log-entry.modification';
-import {DialogEntry} from '../../model/dialog-entry.model';
+import {ModificationKind} from '../model/log-entry.modification';
+import {DialogEntry} from '../model/dialog-entry.model';
 import {getDuration} from '../../shared/time-utils';
 
 @Component({
