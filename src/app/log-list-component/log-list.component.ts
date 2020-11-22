@@ -66,7 +66,6 @@ export class LogListComponent implements OnInit, AfterViewInit {
                 comment: result.comment,
             };
             this.dataSource.data = [...this.dataSource.data, newEntry];
-            console.log('>> close', result);
         });
     }
 
