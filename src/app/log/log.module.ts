@@ -28,13 +28,15 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {LogDatePipe} from './pipe/log-date.pipe';
 import {LogDurationPipe} from './pipe/log-duration.pipe';
+import { LogCreateComponent } from './log-create/log-create.component';
 
 @NgModule({
     declarations: [
         LogEntryDialogComponent,
         LogListComponent,
         LogDatePipe,
-        LogDurationPipe
+        LogDurationPipe,
+        LogCreateComponent
     ],
     imports: [
         CommonModule,
