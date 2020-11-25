@@ -6,3 +6,12 @@ export interface DialogEntry {
     endTime: TimeOfDay;
     comment?: string;
 }
+
+export const enum DialogCloseEvent {
+    CONFIRMED, CANCELED
+}
+
+export interface DialogCloseResult {
+    event: DialogCloseEvent;
+    result: DialogEntry | undefined;
+}

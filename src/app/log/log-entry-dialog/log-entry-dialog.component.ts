@@ -1,16 +1,17 @@
-import {Component, Inject, OnInit, Optional} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject, OnInit, Optional} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {LogEntryModification, ModificationKind} from '../model/log-entry.modification';
 import {LogEntry} from '../model/log-entry';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {endTimeIsAfterStartTime, workingDateNotAfter} from '../../shared/dialog-validators.directive';
 import {getDefaultEndTime, getDefaultStartTime, getTimeOfDay, TIME_FORMAT} from '../../shared/time-utils';
-import {DialogEntry} from '../model/dialog-entry.model';
+import {DialogCloseEvent, DialogEntry} from '../model/dialog-entry.model';
 
 @Component({
     selector: 'app-create-log-entry',
     templateUrl: './log-entry-dialog.component.html',
-    styleUrls: ['./log-entry-dialog.component.css']
+    styleUrls: ['./log-entry-dialog.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LogEntryDialogComponent implements OnInit {
 
@@ -46,11 +47,14 @@ export class LogEntryDialogComponent implements OnInit {
             endTime: getTimeOfDay(this.formGroup?.get('endTime')?.value),
             comment: this.formGroup?.get('comment')?.value
         };
-        this.dialogRef.close(result);
+        this.dialogRef.close({
+            event: DialogCloseEvent.CONFIRMED,
+            result
+        });
     }
 
     closeDialog(): void {
-        this.dialogRef.close({event: 'Cancel'});
+        this.dialogRef.close({event: DialogCloseEvent.CANCELED});
     }
 
 }

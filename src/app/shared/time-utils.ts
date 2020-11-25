@@ -79,3 +79,6 @@ export function getDuration(startTime: TimeOfDay, endTime: TimeOfDay): Duration 
     };
 }
 
+export function dateToIsoString(date: Date): string {
+    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+}

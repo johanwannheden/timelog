@@ -6,8 +6,10 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {LogEntryDialogComponent} from '../log-entry-dialog/log-entry-dialog.component';
 import {ModificationKind} from '../model/log-entry.modification';
-import {DialogEntry} from '../model/dialog-entry.model';
-import {getDuration} from '../../shared/time-utils';
+import {DialogCloseEvent, DialogCloseResult} from '../model/dialog-entry.model';
+import {dateToIsoString, getDuration} from '../../shared/time-utils';
+import {Store} from '@ngrx/store';
+import {storeLogEntry} from '../state/log.actions';
 
 @Component({
     selector: 'app-log-list-component',
@@ -26,7 +28,7 @@ export class LogListComponent implements OnInit, AfterViewInit {
     // @ts-ignore
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
-    constructor(public dialog: MatDialog) {
+    constructor(public dialog: MatDialog, private store: Store) {
     }
 
     ngOnInit(): void {
@@ -50,15 +52,26 @@ export class LogListComponent implements OnInit, AfterViewInit {
             data: {kind, data}
         });
 
-        dialogRef.afterClosed().subscribe((result: DialogEntry) => {
-            const newEntry: LogEntry = {
-                date: result.date,
-                dateAdded: result.date,
-                dateUpdated: new Date(),
-                duration: getDuration(result.startTime, result.endTime),
-                comment: result.comment,
-            };
-            this.dataSource.data = [...this.dataSource.data, newEntry];
+        dialogRef.afterClosed().subscribe((result: DialogCloseResult) => {
+            if (result?.event === DialogCloseEvent.CONFIRMED && result?.result) {
+                const entry = result.result;
+                const newEntry: LogEntry = {
+                    date: entry.date,
+                    dateAdded: entry.date,
+                    dateUpdated: new Date(),
+                    duration: getDuration(entry.startTime, entry.endTime),
+                    comment: entry.comment,
+                };
+                this.dataSource.data = [...this.dataSource.data, newEntry];
+
+                this.store.dispatch(storeLogEntry({
+                    date: dateToIsoString(newEntry.date),
+                    comment: newEntry.comment,
+                    dateAdded: newEntry.dateAdded.toISOString(),
+                    dateUpdated: newEntry.dateAdded.toISOString(),
+                    duration: newEntry.duration.hours + ':' + newEntry.duration.minutes,
+                }));
+            }
         });
     }
 

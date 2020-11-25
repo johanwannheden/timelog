@@ -28,7 +28,9 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {LogDatePipe} from './pipe/log-date.pipe';
 import {LogDurationPipe} from './pipe/log-duration.pipe';
-import { LogCreateComponent } from './log-create/log-create.component';
+import {StoreModule} from '@ngrx/store';
+import {logReducer} from './state/log.reducers';
+import {RouterModule} from '@angular/router';
 
 @NgModule({
     declarations: [
@@ -36,13 +38,17 @@ import { LogCreateComponent } from './log-create/log-create.component';
         LogListComponent,
         LogDatePipe,
         LogDurationPipe,
-        LogCreateComponent
     ],
     imports: [
         CommonModule,
         LogRoutingModule,
+        ReactiveFormsModule,
+        RouterModule,
+        FormsModule,
 
         FlexLayoutModule,
+
+        StoreModule.forFeature('log', logReducer),
 
         // material
         CommonModule,
@@ -67,8 +73,6 @@ import { LogCreateComponent } from './log-create/log-create.component';
         MatDatepickerModule,
         MatNativeDateModule,
         MatDialogModule,
-        FormsModule,
-        ReactiveFormsModule
     ],
     // exports: [LogEntryDialogComponent, LogListComponent]
 })

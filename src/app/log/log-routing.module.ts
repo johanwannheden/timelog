@@ -2,13 +2,10 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {LogListComponent} from './log-list/log-list.component';
-import {LogCreateComponent} from './log-create/log-create.component';
 
 const routes: Routes = [
-    // { path: 'create', component: LogEntryCreateComponent },
-    {path: '', redirectTo: 'list'},
-    {path: 'create', component: LogCreateComponent},
     {path: 'list', component: LogListComponent},
+    {path: '', redirectTo: 'list'},
 ];
 
 @NgModule({
@@ -16,6 +13,7 @@ const routes: Routes = [
         CommonModule,
         RouterModule.forChild(routes)
     ],
+    exports: [RouterModule]
 })
 export class LogRoutingModule {
 }
