@@ -4,7 +4,7 @@ import {LogEntryModification, ModificationKind} from '../model/log-entry.modific
 import {LogEntry} from '../model/log-entry';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {endTimeIsAfterStartTime, workingDateNotAfter} from '../../shared/dialog-validators.directive';
-import {getDefaultEndTime, getDefaultStartTime, getTimeOfDay, TIME_FORMAT} from '../../shared/time-utils';
+import {getDefaultEndTime, getDefaultStartTime, TIME_FORMAT} from '../../shared/time-utils';
 import {DialogCloseEvent, DialogEntry} from '../model/dialog-entry.model';
 
 @Component({
@@ -43,8 +43,8 @@ export class LogEntryDialogComponent implements OnInit {
     doAction(): void {
         const result: DialogEntry = {
             date: this.formGroup?.get('date')?.value as Date,
-            startTime: getTimeOfDay(this.formGroup?.get('startTime')?.value),
-            endTime: getTimeOfDay(this.formGroup?.get('endTime')?.value),
+            startTime: this.formGroup?.get('startTime')?.value,
+            endTime: this.formGroup?.get('endTime')?.value,
             comment: this.formGroup?.get('comment')?.value
         };
         this.dialogRef.close({
