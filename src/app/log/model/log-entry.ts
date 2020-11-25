@@ -1,7 +1,7 @@
 import {Duration} from '../../model/duration';
 
 export interface LogEntry {
-    date: Date;
+    date: string;
     duration: Duration;
     comment?: string;
 

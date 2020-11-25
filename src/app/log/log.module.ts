@@ -26,7 +26,6 @@ import {MatNativeDateModule} from '@angular/material/core';
 import {MatDialogModule} from '@angular/material/dialog';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FlexLayoutModule} from '@angular/flex-layout';
-import {LogDatePipe} from './pipe/log-date.pipe';
 import {LogDurationPipe} from './pipe/log-duration.pipe';
 import {StoreModule} from '@ngrx/store';
 import {logReducer} from './state/log.reducers';
@@ -36,7 +35,6 @@ import {RouterModule} from '@angular/router';
     declarations: [
         LogEntryDialogComponent,
         LogListComponent,
-        LogDatePipe,
         LogDurationPipe,
     ],
     imports: [

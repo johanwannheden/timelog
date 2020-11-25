@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {LogEntry} from '../model/log-entry';
 import {MatSort} from '@angular/material/sort';
@@ -6,44 +6,49 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {LogEntryDialogComponent} from '../log-entry-dialog/log-entry-dialog.component';
 import {ModificationKind} from '../model/log-entry.modification';
-import {DialogCloseEvent, DialogCloseResult} from '../model/dialog-entry.model';
+import {DialogCloseEvent, DialogCloseResult, DialogEntry} from '../model/dialog-entry.model';
 import {dateToIsoString, getDuration} from '../../shared/time-utils';
 import {Store} from '@ngrx/store';
 import {storeLogEntry} from '../state/log.actions';
+import {selectLogEntries} from '../state/log.selectors';
+import {takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
 
 @Component({
     selector: 'app-log-list-component',
     templateUrl: './log-list.component.html',
     styleUrls: ['./log-list.component.css']
 })
-export class LogListComponent implements OnInit, AfterViewInit {
+export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     add = ModificationKind.Add;
 
     public displayedColumns = ['date', 'duration', 'comment', 'update', 'delete'];
     public dataSource = new MatTableDataSource<LogEntry>();
-
     // @ts-ignore
     @ViewChild(MatSort) sort: MatSort;
     // @ts-ignore
     @ViewChild(MatPaginator) paginator: MatPaginator;
+    private destroy$ = new Subject();
 
     constructor(public dialog: MatDialog, private store: Store) {
     }
 
     ngOnInit(): void {
-        const sample: LogEntry = {
-            date: new Date(),
-            dateAdded: new Date(),
-            dateUpdated: undefined,
-            comment: 'Test entry',
-            duration: {hours: 5, minutes: 30}
-        };
-        this.dataSource.data = [sample];
+        this.store.select(selectLogEntries).pipe(
+            takeUntil(this.destroy$)
+        ).subscribe(entries => {
+            this.dataSource.data = entries as LogEntry[];
+        });
 
         this.dataSource.filterPredicate = ((data, filter) => {
             return !!data?.comment?.includes(filter);
         });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     openDialog(kind: ModificationKind, data?: LogEntry): void {
@@ -54,27 +59,18 @@ export class LogListComponent implements OnInit, AfterViewInit {
 
         dialogRef.afterClosed().subscribe((result: DialogCloseResult) => {
             if (result?.event === DialogCloseEvent.CONFIRMED && result?.result) {
-                const entry = result.result;
-                const newEntry: LogEntry = {
-                    date: entry.date,
-                    dateAdded: entry.date,
-                    dateUpdated: new Date(),
-                    duration: getDuration(entry.startTime, entry.endTime),
-                    comment: entry.comment,
-                };
-                this.dataSource.data = [...this.dataSource.data, newEntry];
-
+                const entry: DialogEntry = result.result;
+                const duration = getDuration(entry.startTime, entry.endTime);
                 this.store.dispatch(storeLogEntry({
-                    date: dateToIsoString(newEntry.date),
-                    comment: newEntry.comment,
-                    dateAdded: newEntry.dateAdded.toISOString(),
-                    dateUpdated: newEntry.dateAdded.toISOString(),
-                    duration: newEntry.duration.hours + ':' + newEntry.duration.minutes,
+                    date: dateToIsoString(entry.date),
+                    comment: entry.comment,
+                    dateAdded: data?.dateAdded.toISOString() ?? new Date().toISOString(),
+                    dateUpdated: new Date().toISOString(),
+                    duration: duration.hours + ':' + duration.minutes,
                 }));
             }
         });
     }
-
 
     ngAfterViewInit(): void {
         this.dataSource.sort = this.sort;

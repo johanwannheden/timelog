@@ -79,6 +79,15 @@ export function getDuration(startTime: TimeOfDay, endTime: TimeOfDay): Duration 
     };
 }
 
+export function parseDuration(value: string): Duration {
+    const hours = value.substring(0, value.indexOf(':'));
+    const minutes = value.substring(hours.length + 1);
+    return {
+        hours: Number(hours),
+        minutes: Number(minutes)
+    };
+}
+
 export function dateToIsoString(date: Date): string {
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
