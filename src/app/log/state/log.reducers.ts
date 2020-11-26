@@ -6,7 +6,7 @@ const initialState: LogState = {logEntries: {}};
 
 export const logReducer = createReducer(
     initialState,
-    on(storeLogEntry, (state, {date, comment, dateAdded, dateUpdated, startTime, endTime, duration}) => ({
+    on(storeLogEntry, (state, {date, comment, dateAdded, dateUpdated, startTime, endTime}) => ({
         logEntries: {
             ...state.logEntries,
             [date]: {
@@ -16,7 +16,6 @@ export const logReducer = createReducer(
                 dateUpdated,
                 startTime,
                 endTime,
-                duration,
             }
         }
     }))

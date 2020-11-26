@@ -4,6 +4,5 @@ export interface LogEntryState {
     dateUpdated: string;
     startTime: string;
     endTime: string;
-    duration: string;
     comment?: string;
 }

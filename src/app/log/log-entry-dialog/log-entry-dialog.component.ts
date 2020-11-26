@@ -4,12 +4,17 @@ import {LogEntryModification, ModificationKind} from '../model/log-entry.modific
 import {LogEntry} from '../model/log-entry';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {endTimeIsAfterStartTime, workingDateNotAfter} from '../../shared/dialog-validators.directive';
-import {getDefaultEndTime, getDefaultStartTime, TIME_FORMAT} from '../../shared/time-utils';
-import {DialogCloseEvent, DialogEntry} from '../model/dialog-entry.model';
+import {getDefaultEndTime, getDefaultStartTime, getDuration, getTimeOfDay, TIME_FORMAT} from '../../shared/time-utils';
+import {DialogEntry} from '../model/dialog-entry.model';
+import {Store} from '@ngrx/store';
+import {processDialogEntry} from '../state/log.actions';
+import {selectLogEntryKeys} from '../state/log.selectors';
+import {LogDateValidator} from './log-date.validator';
 
 @Component({
     selector: 'app-create-log-entry',
-    templateUrl: './log-entry-dialog.component.html',
+    templateUrl:
+        './log-entry-dialog.component.html',
     styleUrls: ['./log-entry-dialog.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -20,10 +25,14 @@ export class LogEntryDialogComponent implements OnInit {
     action: ModificationKind;
     logEntry: LogEntry | undefined;
 
+    logEntries$ = this.store.select(selectLogEntryKeys);
+
     constructor(
         public dialogRef: MatDialogRef<LogEntryDialogComponent>,
         @Optional() @Inject(MAT_DIALOG_DATA) modification: LogEntryModification,
-        private formBuilder: FormBuilder
+        private formBuilder: FormBuilder,
+        private store: Store,
+        private dateValidator: LogDateValidator
     ) {
         this.logEntry = modification.data;
         this.action = modification.kind;
@@ -31,7 +40,8 @@ export class LogEntryDialogComponent implements OnInit {
 
     ngOnInit(): void {
         this.formGroup = this.formBuilder.group({
-            date: [new Date(), [Validators.required, workingDateNotAfter(new Date())]],
+            date: [new Date(), [Validators.required, workingDateNotAfter(new Date())],
+                this.dateValidator.validate.bind(this.dateValidator)],
             startTime: [getDefaultStartTime(), [Validators.required, Validators.pattern(TIME_FORMAT)]],
             endTime: [getDefaultEndTime(), [Validators.required, Validators.pattern(TIME_FORMAT)]],
             comment: ['']
@@ -41,20 +51,26 @@ export class LogEntryDialogComponent implements OnInit {
     }
 
     doAction(): void {
-        const result: DialogEntry = {
-            date: this.formGroup?.get('date')?.value as Date,
-            startTime: this.formGroup?.get('startTime')?.value,
-            endTime: this.formGroup?.get('endTime')?.value,
-            comment: this.formGroup?.get('comment')?.value
+        const date = this.formGroup?.get('date')?.value as Date;
+        const comment = this.formGroup?.get('comment')?.value;
+        const startTime = getTimeOfDay(this.formGroup?.get('startTime')?.value);
+        const endTime = getTimeOfDay(this.formGroup?.get('endTime')?.value);
+        const duration = getDuration(startTime, endTime);
+
+        const dialogEntry: DialogEntry = {
+            comment,
+            date,
+            endTime,
+            startTime
         };
-        this.dialogRef.close({
-            event: DialogCloseEvent.CONFIRMED,
-            result
-        });
+
+        this.store.dispatch(processDialogEntry(dialogEntry));
+
+        this.dialogRef.close(undefined);
     }
 
     closeDialog(): void {
-        this.dialogRef.close({event: DialogCloseEvent.CANCELED});
+        this.dialogRef.close(undefined);
     }
 
 }

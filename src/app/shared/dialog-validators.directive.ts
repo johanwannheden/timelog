@@ -5,7 +5,7 @@ export function workingDateNotAfter(value: Date): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
         const givenDate = control?.value as Date;
         return givenDate?.valueOf() > value.valueOf() ? {
-            invalidDate: {value: givenDate}
+            dateInFuture: {value: givenDate}
         } : null;
     };
 }

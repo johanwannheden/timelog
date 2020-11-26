@@ -6,10 +6,7 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {LogEntryDialogComponent} from '../log-entry-dialog/log-entry-dialog.component';
 import {ModificationKind} from '../model/log-entry.modification';
-import {DialogCloseEvent, DialogCloseResult, DialogEntry} from '../model/dialog-entry.model';
-import {dateToIsoString, getDuration, getTimeOfDay} from '../../shared/time-utils';
 import {Store} from '@ngrx/store';
-import {storeLogEntry} from '../state/log.actions';
 import {selectLogEntries} from '../state/log.selectors';
 import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
@@ -52,28 +49,9 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     openDialog(kind: ModificationKind, data?: LogEntry): void {
-        const dialogRef = this.dialog.open(LogEntryDialogComponent, {
+        this.dialog.open(LogEntryDialogComponent, {
             width: '250px',
             data: {kind, data}
-        });
-
-        dialogRef.afterClosed().subscribe((result: DialogCloseResult) => {
-            if (result?.event === DialogCloseEvent.CONFIRMED && result?.result) {
-                const entry: DialogEntry = result.result;
-                const duration = getDuration(
-                    getTimeOfDay(entry.startTime),
-                    getTimeOfDay(entry.endTime)
-                );
-                this.store.dispatch(storeLogEntry({
-                    date: dateToIsoString(entry.date),
-                    comment: entry.comment,
-                    dateAdded: data?.dateAdded.toISOString() ?? new Date().toISOString(),
-                    dateUpdated: new Date().toISOString(),
-                    startTime: entry.startTime,
-                    endTime: entry.endTime,
-                    duration: duration.hours + ':' + duration.minutes,
-                }));
-            }
         });
     }
 

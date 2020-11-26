@@ -1,7 +1,6 @@
 import {createFeatureSelector, createSelector} from '@ngrx/store';
 import {LogState} from './log.state';
 import {LogEntry} from '../model/log-entry';
-import {parseDuration} from '../../shared/time-utils';
 
 export const selectLogState = createFeatureSelector<LogState>('log');
 
@@ -14,7 +13,11 @@ export const selectLogEntries = createSelector(
             comment: it.comment,
             dateAdded: new Date(Date.parse(it.dateAdded)),
             dateUpdated: it.dateUpdated && new Date(Date.parse(it.dateUpdated)),
-            duration: parseDuration(it.duration)
         }) as LogEntry);
     }
+);
+
+export const selectLogEntryKeys = createSelector(
+    selectLogEntries,
+    (entries) => entries.map(e => e.date)
 );

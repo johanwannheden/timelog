@@ -8,6 +8,8 @@ import {MAT_DATE_LOCALE} from '@angular/material/core';
 import {StoreModule} from '@ngrx/store';
 import {RouterModule} from '@angular/router';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
+import {EffectsModule} from '@ngrx/effects';
+import {LogEffects} from './log/state/log.effects';
 
 @NgModule({
     declarations: [
@@ -21,6 +23,7 @@ import {StoreDevtoolsModule} from '@ngrx/store-devtools';
         AppRoutingModule,
 
         StoreModule.forRoot({}, {}),
+        EffectsModule.forRoot([LogEffects]),
         StoreDevtoolsModule.instrument()
     ],
     providers: [
