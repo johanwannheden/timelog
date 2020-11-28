@@ -22,7 +22,6 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatCardModule} from '@angular/material/card';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatDatepickerModule} from '@angular/material/datepicker';
-import {DateAdapter, MAT_DATE_LOCALE, MatNativeDateModule} from '@angular/material/core';
 import {MatDialogModule} from '@angular/material/dialog';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FlexLayoutModule} from '@angular/flex-layout';
@@ -30,17 +29,15 @@ import {LogDurationPipe} from './pipe/log-duration.pipe';
 import {StoreModule} from '@ngrx/store';
 import {logReducer} from './state/log.reducers';
 import {RouterModule} from '@angular/router';
-import {MonthDayComponent} from './datepicker/month-day.component';
 import {YearMonthFormatDirective} from './shared/year-month-format.directive';
 import {YearMonthDayFormatDirective} from './shared/year-month-day-format.directive';
-import {MatMomentDateModule, MomentDateAdapter, MomentDateModule} from '@angular/material-moment-adapter';
+import {MatMomentDateModule} from '@angular/material-moment-adapter';
 
 @NgModule({
     declarations: [
         LogEntryDialogComponent,
         LogListComponent,
         LogDurationPipe,
-        MonthDayComponent,
         YearMonthFormatDirective,
         YearMonthDayFormatDirective
     ],
@@ -77,15 +74,11 @@ import {MatMomentDateModule, MomentDateAdapter, MomentDateModule} from '@angular
         MatCardModule,
         MatExpansionModule,
         MatDatepickerModule,
-        MatNativeDateModule,
         MatDialogModule,
     ],
     exports: [
         YearMonthFormatDirective,
         YearMonthDayFormatDirective
-    ],
-    providers: [
-        {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE]},
     ],
 })
 export class LogModule {

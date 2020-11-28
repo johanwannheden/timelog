@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>Log Entry {{((logEntries$ | async) || []).length + 1}}</h1>
 <ng-container *ngIf="formGroup as fg">
     <form [formGroup]="fg">
-        <mat-form-field>
+        <mat-form-field appYearMonthDayFormat>
             <input [matDatepicker]="picker" formControlName='date' matInput placeholder="Date">
             <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>

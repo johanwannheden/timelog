@@ -5,7 +5,7 @@ import {switchMap} from 'rxjs/operators';
 import {Store} from '@ngrx/store';
 import {LogEntryState} from './log-entry.state';
 import {of} from 'rxjs';
-import {dateToIsoString} from '../../shared/time-utils';
+import {momentToId} from '../../shared/time-utils';
 
 // noinspection JSUnusedGlobalSymbols
 @Injectable()
@@ -16,9 +16,9 @@ export class LogEffects {
                 ofType(processDialogEntry),
                 switchMap((action) => {
                     const logEntryState: LogEntryState = {
-                        date: dateToIsoString(action.date),
-                        dateAdded: dateToIsoString(new Date()),
-                        dateUpdated: dateToIsoString(new Date()),
+                        date: momentToId(action.date),
+                        dateAdded: new Date().toISOString(),
+                        dateUpdated: new Date().toISOString(),
                         startTime: action.startTime.hour + ':' + action.startTime.minute,
                         endTime: action.endTime.hour + ':' + action.endTime.minute,
                         comment: action.comment

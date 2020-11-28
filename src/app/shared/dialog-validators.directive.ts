@@ -1,9 +1,10 @@
 import {AbstractControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {getMinuteOfDay, isValidFormat} from './time-utils';
+import {Moment} from 'moment';
 
-export function workingDateNotAfter(value: Date): ValidatorFn {
+export function workingDateNotAfter(value: Moment): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
-        const givenDate = control?.value as Date;
+        const givenDate = control?.value as Moment;
         return givenDate?.valueOf() > value.valueOf() ? {
             dateInFuture: {value: givenDate}
         } : null;

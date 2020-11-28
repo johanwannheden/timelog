@@ -3,8 +3,9 @@ import {AbstractControl, AsyncValidator, ValidationErrors} from '@angular/forms'
 import {Observable, of} from 'rxjs';
 import {Store} from '@ngrx/store';
 import {selectLogEntryKeys} from '../state/log.selectors';
-import {map, switchMap, take} from 'rxjs/operators';
-import {dateToIsoString} from '../../shared/time-utils';
+import {map, take} from 'rxjs/operators';
+import {Moment} from 'moment';
+import {momentToId} from '../../shared/time-utils';
 
 @Injectable({
     providedIn: 'root'
@@ -17,15 +18,15 @@ export class LogDateValidator implements AsyncValidator {
     }
 
     validate(control: AbstractControl): Observable<ValidationErrors | null> {
-        const date = control?.value as Date;
-        if (date) {
+        const moment = control?.value as Moment;
+        if (moment) {
             return this.logEntryKeys$
                 .pipe(
                     map(keys => {
-                        const dateAsString = dateToIsoString(date);
-                        if (keys?.find(it => it === dateAsString)) {
+                        const momentAsId = momentToId(moment);
+                        if (keys?.find(it => it === momentAsId)) {
                             return {
-                                duplicateDateEntry: dateAsString
+                                duplicateDateEntry: momentAsId
                             };
                         }
                         return null;

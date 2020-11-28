@@ -10,6 +10,8 @@ import {Store} from '@ngrx/store';
 import {processDialogEntry} from '../state/log.actions';
 import {selectLogEntryKeys} from '../state/log.selectors';
 import {LogDateValidator} from './log-date.validator';
+import * as moment from 'moment';
+import {Moment} from 'moment';
 
 @Component({
     selector: 'app-create-log-entry',
@@ -40,7 +42,7 @@ export class LogEntryDialogComponent implements OnInit {
 
     ngOnInit(): void {
         this.formGroup = this.formBuilder.group({
-            date: [new Date(), [Validators.required, workingDateNotAfter(new Date())],
+            date: [moment(), [Validators.required, workingDateNotAfter(moment())],
                 this.dateValidator.validate.bind(this.dateValidator)],
             startTime: [getDefaultStartTime(), [Validators.required, Validators.pattern(TIME_FORMAT)]],
             endTime: [getDefaultEndTime(), [Validators.required, Validators.pattern(TIME_FORMAT)]],
@@ -51,7 +53,7 @@ export class LogEntryDialogComponent implements OnInit {
     }
 
     doAction(): void {
-        const date = this.formGroup?.get('date')?.value as Date;
+        const date = this.formGroup?.get('date')?.value as Moment;
         const comment = this.formGroup?.get('comment')?.value;
         const startTime = getTimeOfDay(this.formGroup?.get('startTime')?.value);
         const endTime = getTimeOfDay(this.formGroup?.get('endTime')?.value);

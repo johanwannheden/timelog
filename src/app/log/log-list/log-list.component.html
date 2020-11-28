@@ -1,6 +1,8 @@
 <div fxLayout fxLayout.lt-md="column wrap" fxLayoutAlign="end end" fxLayoutGap.gt-sm="250px"
      fxLayoutGap.lt-md="20px">
-    <button (click)="openDialog(add)" color="primary" mat-button mat-flat-button>Add Row</button>
+    <button (click)="openDialog(add)" color="primary" mat-icon-button>
+        <mat-icon>add</mat-icon>
+    </button>
 </div>
 <table (matSortChange)="customSort($event)" [dataSource]="dataSource" mat-table matSort matSortStart="desc">
     <ng-container matColumnDef="date">

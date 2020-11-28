@@ -1,5 +1,7 @@
 import {TimeOfDay} from '../model/time-of-day.model';
 import {Duration} from '../model/duration';
+import {Moment} from 'moment';
+import * as moment from 'moment';
 
 export const TIME_FORMAT = /^([0-2][0-9])([:.-]?([0-5][0-9]))?$/;
 
@@ -88,6 +90,10 @@ export function parseDuration(value: string): Duration {
     };
 }
 
-export function dateToIsoString(date: Date): string {
-    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+export function momentToId(value: Moment): string {
+    return value.format('YYYY-MM-DD');
+}
+
+export function idToMoment(value: string): Moment {
+    return moment(value);
 }
