@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
-import {LogEntry} from '../model/log-entry';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
@@ -10,6 +9,8 @@ import {Store} from '@ngrx/store';
 import {selectLogEntries} from '../state/log.selectors';
 import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
+import {LogEntry} from '../state/log.entry';
+import {deleteLogEntry} from '../state/log.actions';
 
 @Component({
     selector: 'app-log-list-component',
@@ -35,7 +36,7 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.store.select(selectLogEntries).pipe(
             takeUntil(this.destroy$)
         ).subscribe(entries => {
-            this.dataSource.data = entries as LogEntry[];
+            this.dataSource.data = entries ? entries as LogEntry[] : [];
         });
 
         this.dataSource.filterPredicate = ((data, filter) => {
@@ -48,7 +49,7 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.destroy$.complete();
     }
 
-    openDialog(kind: ModificationKind, data?: LogEntry): void {
+    openDialog(kind: ModificationKind, data?: string): void {
         this.dialog.open(LogEntryDialogComponent, {
             width: '250px',
             data: {kind, data}
@@ -71,10 +72,10 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     redirectToUpdate(date: string): void {
-        // do nothing
+        this.openDialog(ModificationKind.Update, date);
     }
 
     redirectToDelete(date: string): void {
-        // do nothing
+        this.store.dispatch(deleteLogEntry({date}));
     }
 }

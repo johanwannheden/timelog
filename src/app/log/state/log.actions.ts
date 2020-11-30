@@ -1,12 +1,22 @@
 import {createAction, props} from '@ngrx/store';
-import {LogEntryState} from './log-entry.state';
+import {LogEntry} from './log.entry';
 import {DialogEntry} from '../model/dialog-entry.model';
 
 export const loadLogEntries = createAction('[Log List Component] Load Log Entries');
 
 export const storeLogEntry = createAction(
-    '[Log List Component] Store Log Entry',
-    props<LogEntryState>()
+    '[Log Entry Dialog Component] Store Log Entry',
+    props<LogEntry>()
+);
+
+export const deleteLogEntry = createAction(
+    '[Log List Component] Delete Log Entry',
+    props<{ date: string }>()
+);
+
+export const updateLogEntry = createAction(
+    '[Log Entry Dialog Component] Update Log Entry',
+    props<LogEntry>()
 );
 
 export const processDialogEntry = createAction(

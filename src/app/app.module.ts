@@ -27,7 +27,7 @@ import {LogEffects} from './log/state/log.effects';
         StoreDevtoolsModule.instrument()
     ],
     providers: [
-        {provide: MAT_DATE_LOCALE, useValue: 'de-CH'}
+        {provide: MAT_DATE_LOCALE, useValue: 'de-CH'},
     ],
     bootstrap: [AppComponent]
 })

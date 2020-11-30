@@ -1,7 +1,7 @@
 import {TimeOfDay} from '../model/time-of-day.model';
 import {Duration} from '../model/duration';
-import {Moment} from 'moment';
 import * as moment from 'moment';
+import {Moment} from 'moment';
 
 export const TIME_FORMAT = /^([0-2][0-9])([:.-]?([0-5][0-9]))?$/;
 
@@ -75,11 +75,20 @@ export function getDefaultEndTime(day: DAY_OF_WEEK = getCurrentDayOfWeek()): str
 }
 
 export function getDuration(startTime: TimeOfDay, endTime: TimeOfDay): Duration {
+    const from = moment.duration(startTime.hour, 'hours').add(startTime.minute, 'minutes');
+    const to = moment.duration(endTime.hour, 'hours').add(endTime.minute, 'minutes');
+
+    const duration = to.subtract(from);
+
     return {
-        hours: endTime.hour - startTime.hour,
-        minutes: endTime.minute - startTime.minute
+        hours: duration.hours(),
+        minutes: duration.minutes()
     };
 }
+
+export const getDurationAsString = (startTime: TimeOfDay, endTime: TimeOfDay): string => durationToString(getDuration(startTime, endTime));
+
+export const durationToString = (value: Duration): string => value.hours + ':' + value.minutes;
 
 export function parseDuration(value: string): Duration {
     const hours = value.substring(0, value.indexOf(':'));

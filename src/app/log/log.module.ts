@@ -27,11 +27,11 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {LogDurationPipe} from './pipe/log-duration.pipe';
 import {StoreModule} from '@ngrx/store';
-import {logReducer} from './state/log.reducers';
 import {RouterModule} from '@angular/router';
 import {YearMonthFormatDirective} from './shared/year-month-format.directive';
 import {YearMonthDayFormatDirective} from './shared/year-month-day-format.directive';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
+import {logEntryReducer} from './state/log.reducer';
 
 @NgModule({
     declarations: [
@@ -50,7 +50,7 @@ import {MatMomentDateModule} from '@angular/material-moment-adapter';
 
         FlexLayoutModule,
 
-        StoreModule.forFeature('log', logReducer),
+        StoreModule.forFeature('logEntries', logEntryReducer),
 
         // material
         CommonModule,

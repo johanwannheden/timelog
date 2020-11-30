@@ -1,23 +1,59 @@
 import {createFeatureSelector, createSelector} from '@ngrx/store';
-import {LogState} from './log.state';
-import {LogEntry} from '../model/log-entry';
+import {logAdapter, LogEntryState} from './log.adapter';
+import {LogEntry} from './log.entry';
 
-export const selectLogState = createFeatureSelector<LogState>('log');
+export const selectLogEntryState = createFeatureSelector<LogEntryState>('logEntries');
+
+export const {
+    selectAll,
+    selectEntities,
+    selectIds,
+    selectTotal
+
+} = logAdapter.getSelectors();
+
+export const selectLogEntryById = (logEntryId: string) => createSelector(
+    selectLogEntryState,
+    logEntryState => {
+        const entry = logEntryState.entities[logEntryId];
+        if (entry) {
+            return ({
+                date: entry.date,
+                startTime: entry.startTime,
+                endTime: entry.endTime,
+                duration: entry.duration,
+                comment: entry.comment,
+                dateAdded: entry.dateAdded,
+                dateUpdated: entry.dateUpdated,
+            }) as LogEntry;
+        }
+        return undefined;
+    }
+);
 
 export const selectLogEntries = createSelector(
-    selectLogState,
-    state => {
-        const logEntryStates = Object.values(state.logEntries);
-        return logEntryStates.map(it => ({
-            date: it.date,
-            comment: it.comment,
-            dateAdded: new Date(Date.parse(it.dateAdded)),
-            dateUpdated: it.dateUpdated && new Date(Date.parse(it.dateUpdated)),
-        }) as LogEntry);
+    selectLogEntryState,
+    (logState: LogEntryState) => {
+        if (!logState?.ids?.length) {
+            return [];
+        }
+        return Object.values(logState.entities).map(it => {
+            // tslint:disable-next-line:no-non-null-assertion
+            const entry = it!;
+            return ({
+                date: entry.date,
+                startTime: entry.startTime,
+                endTime: entry.endTime,
+                duration: entry.duration,
+                comment: entry.comment,
+                dateAdded: entry.dateAdded,
+                dateUpdated: entry.dateUpdated,
+            }) as LogEntry;
+        });
     }
 );
 
 export const selectLogEntryKeys = createSelector(
-    selectLogEntries,
-    (entries) => entries.map(e => e.date)
+    selectLogEntryState,
+    (logState: LogEntryState) => logState.ids
 );
