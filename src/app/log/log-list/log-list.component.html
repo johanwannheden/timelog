@@ -1,8 +1,25 @@
-<div fxLayout fxLayout.lt-md="column wrap" fxLayoutAlign="end end" fxLayoutGap.gt-sm="250px"
+<div fxLayout fxLayout.lt-md="column wrap" fxLayoutAlign="end end"
      fxLayoutGap.lt-md="20px">
     <button (click)="openDialog(add)" color="primary" mat-icon-button>
         <mat-icon>add</mat-icon>
     </button>
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+        <button mat-menu-item>
+            <mat-icon>dialpad</mat-icon>
+            <span>Redial</span>
+        </button>
+        <button mat-menu-item disabled>
+            <mat-icon>voicemail</mat-icon>
+            <span>Check voicemail</span>
+        </button>
+        <button mat-menu-item>
+            <mat-icon>notifications_off</mat-icon>
+            <span>Disable alerts</span>
+        </button>
+    </mat-menu>
 </div>
 <table (matSortChange)="customSort($event)" [dataSource]="dataSource" mat-table matSort matSortStart="desc">
     <ng-container matColumnDef="date">
