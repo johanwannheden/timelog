@@ -1,0 +1,12 @@
+.table-container {
+    max-height: 300px;
+    overflow: auto;
+}
+
+tr.highlighted-row:hover {
+    background: whitesmoke;
+}
+
+tr.highlighted-row:active {
+    background: #efefef;
+}

@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-import {LogEntryDialogComponent} from './log-entry-dialog/log-entry-dialog.component';
+import {LogEntryComponent} from './log-entry/log-entry.component';
 import {LogListComponent} from './log-list/log-list.component';
 import {LogRoutingModule} from './log-routing.module';
 import {CommonModule} from '@angular/common';
@@ -22,14 +22,19 @@ import {YearMonthFormatDirective} from './shared/year-month-format.directive';
 import {YearMonthDayFormatDirective} from './shared/year-month-day-format.directive';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
 import {logEntryReducer} from './state/log.reducer';
+import {SelectMonthComponent} from './select-month/select-month.component';
+import {MatCardModule} from '@angular/material/card';
+import {YearMonthPipe} from './select-month/year-month.pipe';
 
 @NgModule({
     declarations: [
-        LogEntryDialogComponent,
+        LogEntryComponent,
         LogListComponent,
         LogDurationPipe,
+        YearMonthPipe,
         YearMonthFormatDirective,
-        YearMonthDayFormatDirective
+        YearMonthDayFormatDirective,
+        SelectMonthComponent
     ],
     imports: [
         CommonModule,
@@ -55,6 +60,7 @@ import {logEntryReducer} from './state/log.reducer';
         MatInputModule,
         MatPaginatorModule,
         MatDatepickerModule,
+        MatCardModule,
     ],
     exports: [
         YearMonthFormatDirective,

@@ -16,11 +16,11 @@ import {take} from 'rxjs/operators';
 @Component({
     selector: 'app-create-log-entry',
     templateUrl:
-        './log-entry-dialog.component.html',
-    styleUrls: ['./log-entry-dialog.component.css'],
+        './log-entry.component.html',
+    styleUrls: ['./log-entry.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LogEntryDialogComponent implements OnInit {
+export class LogEntryComponent implements OnInit {
 
     formGroup: FormGroup | undefined;
 
@@ -29,7 +29,7 @@ export class LogEntryDialogComponent implements OnInit {
     private readonly entryKey: string | undefined;
 
     constructor(
-        public dialogRef: MatDialogRef<LogEntryDialogComponent>,
+        public dialogRef: MatDialogRef<LogEntryComponent>,
         @Optional() @Inject(MAT_DIALOG_DATA) modification: LogEntryModification,
         private formBuilder: FormBuilder,
         private store: Store,
@@ -79,6 +79,8 @@ export class LogEntryDialogComponent implements OnInit {
 
         this.store.dispatch(processDialogEntry(dialogEntry));
 
+        // TODO should not close dialog itself, should not concern with dialog
+        //  use @Output instead?
         this.dialogRef.close(undefined);
     }
 
@@ -106,5 +108,5 @@ export class LogEntryDialogComponent implements OnInit {
             this.formGroup.get('date')?.disable({onlySelf: true});
         }
     }
-
 }
+

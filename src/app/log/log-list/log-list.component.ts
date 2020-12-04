@@ -3,7 +3,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
-import {LogEntryDialogComponent} from '../log-entry-dialog/log-entry-dialog.component';
+import {LogEntryComponent} from '../log-entry/log-entry.component';
 import {ModificationKind} from '../model/log-entry.modification';
 import {Store} from '@ngrx/store';
 import {selectLogEntries} from '../state/log.selectors';
@@ -11,6 +11,7 @@ import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {LogEntry} from '../state/log.entry';
 import {deleteLogEntry} from '../state/log.actions';
+import {SelectMonthComponent, YearMonth} from '../select-month/select-month.component';
 
 @Component({
     selector: 'app-log-list-component',
@@ -49,8 +50,15 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.destroy$.complete();
     }
 
-    openDialog(kind: ModificationKind, data?: string): void {
-        this.dialog.open(LogEntryDialogComponent, {
+    openContextDateSelectionDialog(): void {
+        const dialogRef = this.dialog.open(SelectMonthComponent);
+        dialogRef.afterClosed().subscribe((value: YearMonth) => {
+            console.log('> got', value);
+        });
+    }
+
+    openLogEntryDialog(kind: ModificationKind, data?: string): void {
+        this.dialog.open(LogEntryComponent, {
             width: '250px',
             data: {kind, data}
         });
@@ -72,7 +80,7 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     redirectToUpdate(date: string): void {
-        this.openDialog(ModificationKind.Update, date);
+        this.openLogEntryDialog(ModificationKind.Update, date);
     }
 
     redirectToDelete(date: string): void {

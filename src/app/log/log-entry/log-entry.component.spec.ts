@@ -1,20 +1,20 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {LogEntryDialogComponent} from './log-entry-dialog.component';
+import {LogEntryComponent} from './log-entry.component';
 
 describe('CreateLogEntryComponent', () => {
-    let component: LogEntryDialogComponent;
-    let fixture: ComponentFixture<LogEntryDialogComponent>;
+    let component: LogEntryComponent;
+    let fixture: ComponentFixture<LogEntryComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [LogEntryDialogComponent]
+            declarations: [LogEntryComponent]
         })
             .compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(LogEntryDialogComponent);
+        fixture = TestBed.createComponent(LogEntryComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
