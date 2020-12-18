@@ -9,7 +9,6 @@ export const {
     selectEntities,
     selectIds,
     selectTotal
-
 } = logAdapter.getSelectors();
 
 export const selectLogEntryById = (logEntryId: string) => createSelector(

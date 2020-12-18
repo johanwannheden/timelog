@@ -5,7 +5,7 @@ import {LogListComponent} from './log-list/log-list.component';
 
 const routes: Routes = [
     {path: 'list', component: LogListComponent},
-    {path: '', redirectTo: 'list'},
+    {path: '**', redirectTo: 'list'},
 ];
 
 @NgModule({

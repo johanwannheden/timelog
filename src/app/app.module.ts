@@ -10,19 +10,22 @@ import {RouterModule} from '@angular/router';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {EffectsModule} from '@ngrx/effects';
 import {LogEffects} from './log/state/log.effects';
+import {HttpClientModule} from '@angular/common/http';
+import {appReducer} from './app.reducer';
 
 @NgModule({
     declarations: [
         AppComponent,
     ],
     imports: [
+        HttpClientModule,
         BrowserAnimationsModule,
         BrowserModule,
         RouterModule,
 
         AppRoutingModule,
 
-        StoreModule.forRoot({}, {}),
+        StoreModule.forRoot(appReducer),
         EffectsModule.forRoot([LogEffects]),
         StoreDevtoolsModule.instrument()
     ],

@@ -25,7 +25,7 @@ export function getTimeOfDay(value: string): TimeOfDay {
         throw new Error('Invalid time (valid hours are 0-23: ' + value);
     }
 
-    return {hour, minute};
+    return new TimeOfDay(hour, minute);
 }
 
 export function getMinuteOfDay(value: string): number {
@@ -64,29 +64,18 @@ export function getDefaultStartTime(day: DAY_OF_WEEK = getCurrentDayOfWeek()): s
     if (day === DAY_OF_WEEK.THURSDAY || day === DAY_OF_WEEK.FRIDAY) {
         return '07:45';
     }
-    return '';
+    return '08:00';
 }
 
 export function getDefaultEndTime(day: DAY_OF_WEEK = getCurrentDayOfWeek()): string {
     if (day === DAY_OF_WEEK.MONDAY || day === DAY_OF_WEEK.THURSDAY || day === DAY_OF_WEEK.FRIDAY) {
         return '17:15';
     }
-    return '';
+    return '18:00';
 }
 
-export function getDuration(startTime: TimeOfDay, endTime: TimeOfDay): Duration {
-    const from = moment.duration(startTime.hour, 'hours').add(startTime.minute, 'minutes');
-    const to = moment.duration(endTime.hour, 'hours').add(endTime.minute, 'minutes');
-
-    const duration = to.subtract(from);
-
-    return {
-        hours: duration.hours(),
-        minutes: duration.minutes()
-    };
-}
-
-export const getDurationAsString = (startTime: TimeOfDay, endTime: TimeOfDay): string => durationToString(getDuration(startTime, endTime));
+export const getDurationAsString = (startTime: TimeOfDay, endTime: TimeOfDay): string =>
+    durationToString(TimeOfDay.getDuration(startTime, endTime));
 
 export const durationToString = (value: Duration): string => value.hours + ':' + value.minutes;
 

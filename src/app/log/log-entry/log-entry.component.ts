@@ -72,8 +72,8 @@ export class LogEntryComponent implements OnInit {
         const dialogEntry: DialogEntry = {
             comment,
             date,
-            endTime,
             startTime,
+            endTime,
             action: this.action
         };
 

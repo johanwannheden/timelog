@@ -12,6 +12,7 @@ import {Subject} from 'rxjs';
 import {LogEntry} from '../state/log.entry';
 import {deleteLogEntry} from '../state/log.actions';
 import {SelectMonthComponent, YearMonth} from '../select-month/select-month.component';
+import {selectStatusMessage} from '../../state/status.selectors';
 
 @Component({
     selector: 'app-log-list-component',
@@ -22,8 +23,11 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     add = ModificationKind.Add;
 
-    public displayedColumns = ['date', 'duration', 'comment', 'update', 'delete'];
-    public dataSource = new MatTableDataSource<LogEntry>();
+    // @ts-ignore
+    error$ = this.store.select(selectStatusMessage);
+
+    displayedColumns = ['date', 'duration', 'comment', 'update', 'delete'];
+    dataSource = new MatTableDataSource<LogEntry>();
     // @ts-ignore
     @ViewChild(MatSort) sort: MatSort;
     // @ts-ignore
