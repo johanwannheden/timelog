@@ -6,13 +6,18 @@ import {MatDialog} from '@angular/material/dialog';
 import {LogEntryComponent} from '../log-entry/log-entry.component';
 import {ModificationKind} from '../model/log-entry.modification';
 import {Store} from '@ngrx/store';
-import {selectLogEntries} from '../state/log.selectors';
-import {takeUntil} from 'rxjs/operators';
+import {selectLogEntries, selectLogEntryById} from '../state/log.selectors';
+import {map, take, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {LogEntry} from '../state/log.entry';
-import {deleteLogEntry} from '../state/log.actions';
+import {triggerLogEntryDeletion} from '../state/log.actions';
 import {SelectMonthComponent, YearMonth} from '../select-month/select-month.component';
 import {selectStatusMessage} from '../../state/status.selectors';
+import {getDurationAsString, getTimeOfDay} from '../../shared/time-utils';
+
+interface LogEntryWithDuration extends LogEntry {
+    duration: string;
+}
 
 @Component({
     selector: 'app-log-list-component',
@@ -39,6 +44,10 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     ngOnInit(): void {
         this.store.select(selectLogEntries).pipe(
+            map(e => e.map(it => ({
+                ...it,
+                duration: getDurationAsString(getTimeOfDay(it.startTime), getTimeOfDay(it.endTime))
+            }))),
             takeUntil(this.destroy$)
         ).subscribe(entries => {
             this.dataSource.data = entries ? entries as LogEntry[] : [];
@@ -88,6 +97,12 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     redirectToDelete(date: string): void {
-        this.store.dispatch(deleteLogEntry({date}));
+        this.store.select(selectLogEntryById(date))
+            .pipe(take(1))
+            .subscribe((entry) => {
+                if (entry) {
+                    this.store.dispatch(triggerLogEntryDeletion(entry));
+                }
+            });
     }
 }

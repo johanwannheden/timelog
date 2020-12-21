@@ -13,21 +13,7 @@ export const {
 
 export const selectLogEntryById = (logEntryId: string) => createSelector(
     selectLogEntryState,
-    logEntryState => {
-        const entry = logEntryState.entities[logEntryId];
-        if (entry) {
-            return ({
-                date: entry.date,
-                startTime: entry.startTime,
-                endTime: entry.endTime,
-                duration: entry.duration,
-                comment: entry.comment,
-                dateAdded: entry.dateAdded,
-                dateUpdated: entry.dateUpdated,
-            }) as LogEntry;
-        }
-        return undefined;
-    }
+    logEntryState => logEntryState.entities[logEntryId]
 );
 
 export const selectLogEntries = createSelector(
@@ -43,7 +29,6 @@ export const selectLogEntries = createSelector(
                 date: entry.date,
                 startTime: entry.startTime,
                 endTime: entry.endTime,
-                duration: entry.duration,
                 comment: entry.comment,
                 dateAdded: entry.dateAdded,
                 dateUpdated: entry.dateUpdated,

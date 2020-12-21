@@ -1,13 +1,18 @@
 import {createReducer, on} from '@ngrx/store';
-import {storeLogEntry, storeLogEntryError} from '../log/state/log.actions';
+import {deleteLogEntryError, storeLogEntry, storeLogEntryError} from '../log/state/log.actions';
 import {StatusState} from './status.selectors';
 
 export const initialState: StatusState = {
-    message: ''
+    message: '',
+    loading: false
 };
 
 export const statusReducer = createReducer<StatusState>(
     initialState,
-    on(storeLogEntryError, (state, {message}) => ({...state, message})),
+    on(
+        storeLogEntryError,
+        deleteLogEntryError,
+        (state, {message}) => ({...state, message})
+    ),
     on(storeLogEntry, state => ({...state, message: ''})),
 );

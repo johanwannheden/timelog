@@ -1,15 +1,21 @@
 import {Actions, createEffect, ofType, ROOT_EFFECTS_INIT} from '@ngrx/effects';
 import {Injectable} from '@angular/core';
-import {loadLogEntries, processDialogEntry, storeLogEntry, storeLogEntryError, updateLogEntry} from './log.actions';
+import {
+    deleteLogEntry,
+    deleteLogEntryError,
+    loadLogEntries,
+    storeLogEntry,
+    storeLogEntryError,
+    triggerLogEntryCreation,
+    triggerLogEntryDeletion,
+    triggerLogEntryUpdate,
+    updateLogEntry
+} from './log.actions';
 import {catchError, map, switchMap} from 'rxjs/operators';
 import {Store} from '@ngrx/store';
 import {LogEntry} from './log.entry';
 import {of} from 'rxjs';
-import {getDurationAsString, momentToId} from '../../shared/time-utils';
-import {ModificationKind} from '../model/log-entry.modification';
-import {DialogEntry} from '../model/dialog-entry.model';
 import {HttpClient} from '@angular/common/http';
-import * as moment from 'moment';
 
 // noinspection JSUnusedGlobalSymbols
 @Injectable()
@@ -18,50 +24,54 @@ export class LogEffects {
     init$ = createEffect(() =>
         this.actions$.pipe(
             ofType(ROOT_EFFECTS_INIT),
-            switchMap(() => {
-                return this.http.get('api/timelog/all').pipe(
+            switchMap(() =>
+                this.http.get('api/timelog/all').pipe(
                     map((data) => loadLogEntries({
                         entries: data as LogEntry[]
                     }))
-                );
-            })
+                )
+            ),
         )
     );
 
-    processDialogEntry$ = createEffect(() => {
+    updateEntry$ = createEffect(() => {
             return this.actions$.pipe(
-                ofType(processDialogEntry),
-                switchMap((action: DialogEntry) => {
-                    const logEntryState = this.convertToLogEntry(action);
-
-                    switch (action.action) {
-                        case ModificationKind.Update:
-                            return this.http.post('api/timelog/update', logEntryState).pipe(
-                                map(() => updateLogEntry(logEntryState)),
-                                catchError((data) => of(storeLogEntryError({message: data.message})))
-                            );
-                        default:
-                            return this.http.put('api/timelog/create', logEntryState).pipe(
-                                map(() => storeLogEntry(logEntryState)),
-                                catchError((data) => of(storeLogEntryError({message: data.message})))
-                            );
-                    }
+                ofType(triggerLogEntryUpdate),
+                switchMap((action: LogEntry) => {
+                    return this.http.post(`api/timelog/update/${action.id}`, action).pipe(
+                        map(() => updateLogEntry(action)),
+                        catchError((data) => of(storeLogEntryError({message: data.message})))
+                    );
                 })
             );
         }
     );
 
-    private convertToLogEntry(action: DialogEntry): LogEntry {
-        return {
-            date: momentToId(action.date),
-            dateAdded: moment().format('YYYY-MM-DDTHH:mm:ss'), // TODO only if creating entry
-            dateUpdated: moment().format('YYYY-MM-DDTHH:mm:ss'),
-            startTime: action.startTime.formatted(),
-            endTime: action.endTime.formatted(),
-            duration: getDurationAsString(action.startTime, action.endTime),
-            comment: action.comment
-        };
-    }
+    createEntry$ = createEffect(() => {
+            return this.actions$.pipe(
+                ofType(triggerLogEntryCreation),
+                switchMap((action: LogEntry) => {
+                    return this.http.put<LogEntry>('api/timelog/create', action).pipe(
+                        map((result) => storeLogEntry(result)),
+                        catchError((data) => of(storeLogEntryError({message: data.message})))
+                    );
+                })
+            );
+        }
+    );
+
+    deleteEntry$ = createEffect(() => {
+            return this.actions$.pipe(
+                ofType(triggerLogEntryDeletion),
+                switchMap((action: LogEntry) => {
+                    return this.http.delete(`api/timelog/delete/${action.id}`).pipe(
+                        map(() => deleteLogEntry(action)),
+                        catchError((data) => of(deleteLogEntryError({message: data.message})))
+                    );
+                })
+            );
+        }
+    );
 
     constructor(private actions$: Actions, private store: Store, private http: HttpClient) {
     }

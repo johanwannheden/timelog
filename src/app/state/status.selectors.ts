@@ -3,6 +3,7 @@ import {AppState} from '../app.reducer';
 
 export interface StatusState {
     message: string;
+    loading: boolean;
 }
 
 export const selectStatusState = createFeatureSelector<StatusState>('status');

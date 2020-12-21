@@ -3,15 +3,14 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {LogEntryModification, ModificationKind} from '../model/log-entry.modification';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {endTimeIsAfterStartTime, workingDateNotAfter} from '../../shared/dialog-validators.directive';
-import {getDefaultEndTime, getDefaultStartTime, getTimeOfDay, TIME_FORMAT} from '../../shared/time-utils';
-import {DialogEntry} from '../model/dialog-entry.model';
+import {getDefaultEndTime, getDefaultStartTime, getTimeOfDay, momentToId, TIME_FORMAT} from '../../shared/time-utils';
 import {Store} from '@ngrx/store';
-import {processDialogEntry} from '../state/log.actions';
 import {LogDateValidator} from './log-date.validator';
 import * as moment from 'moment';
-import {Moment} from 'moment';
 import {selectLogEntries, selectLogEntryById} from '../state/log.selectors';
 import {take} from 'rxjs/operators';
+import {LogEntry} from '../state/log.entry';
+import {triggerLogEntryCreation, triggerLogEntryUpdate} from '../state/log.actions';
 
 @Component({
     selector: 'app-create-log-entry',
@@ -27,6 +26,8 @@ export class LogEntryComponent implements OnInit {
     logEntries$ = this.store.select(selectLogEntries);
     readonly action: ModificationKind;
     private readonly entryKey: string | undefined;
+
+    private logEntry?: LogEntry;
 
     constructor(
         public dialogRef: MatDialogRef<LogEntryComponent>,
@@ -44,40 +45,56 @@ export class LogEntryComponent implements OnInit {
             this.store.select(selectLogEntryById(this.entryKey))
                 .pipe(take(1))
                 .subscribe(it => {
-                    if (it) {
-                        this.initWithData({
-                            date: moment(it.date),
-                            startTime: it.startTime,
-                            endTime: it.endTime,
-                            comment: it.comment,
-                        });
-                    }
-                });
+                        if (it) {
+                            this.logEntry = it;
+                            this.initWithData(it);
+                        }
+                    },
+                    error => console.log('Error: ' + error));
         } else {
-            this.initWithData({
-                date: moment(),
-                startTime: getDefaultStartTime(),
-                endTime: getDefaultEndTime(),
-                comment: ''
-            });
+            this.initWithData();
+        }
+    }
+
+    private initWithData(data?: LogEntry): void {
+        const addNewEntry = !data;
+        const date = moment(data?.date);
+        const startTime = data?.startTime ? getTimeOfDay(data.startTime).formatted() : getDefaultStartTime();
+        const endTime = data?.endTime ? getTimeOfDay(data.endTime).formatted() : getDefaultEndTime();
+        const comment = data?.comment;
+
+        this.formGroup = this.formBuilder.group({
+            date: [date, [Validators.required, workingDateNotAfter(moment())],
+                addNewEntry && this.dateValidator.validate.bind(this.dateValidator)],
+            startTime: [startTime, [Validators.required, Validators.pattern(TIME_FORMAT)]],
+            endTime: [endTime, [Validators.required, Validators.pattern(TIME_FORMAT)]],
+            comment: [comment]
+        }, {
+            validators: endTimeIsAfterStartTime
+        });
+        if (!addNewEntry) {
+            this.formGroup.get('date')?.disable({onlySelf: true});
         }
     }
 
     doAction(): void {
-        const date = this.formGroup?.get('date')?.value as Moment;
-        const comment = this.formGroup?.get('comment')?.value;
-        const startTime = getTimeOfDay(this.formGroup?.get('startTime')?.value);
-        const endTime = getTimeOfDay(this.formGroup?.get('endTime')?.value);
+        const createNewLogEntry = this.action === ModificationKind.Add;
 
-        const dialogEntry: DialogEntry = {
-            comment,
-            date,
-            startTime,
-            endTime,
-            action: this.action
+        this.logEntry = {
+            id: this.logEntry?.id,
+            date: momentToId(this.formGroup?.get('date')?.value),
+            comment: this.formGroup?.get('comment')?.value,
+            startTime: getTimeOfDay(this.formGroup?.get('startTime')?.value).formatted(),
+            endTime: getTimeOfDay(this.formGroup?.get('endTime')?.value).formatted(),
+            dateAdded: this.logEntry?.dateAdded ?? moment().format('YYYY-MM-DDTHH:mm:ss'),
+            dateUpdated: moment().format('YYYY-MM-DDTHH:mm:ss'),
         };
 
-        this.store.dispatch(processDialogEntry(dialogEntry));
+        if (createNewLogEntry) {
+            this.store.dispatch(triggerLogEntryCreation(this.logEntry));
+        } else {
+            this.store.dispatch(triggerLogEntryUpdate(this.logEntry));
+        }
 
         // TODO should not close dialog itself, should not concern with dialog
         //  use @Output instead?
@@ -86,27 +103,6 @@ export class LogEntryComponent implements OnInit {
 
     closeDialog(): void {
         this.dialogRef.close(undefined);
-    }
-
-    private initWithData(data: {
-        date: Moment,
-        startTime?: string,
-        endTime?: string,
-        comment?: string
-    }): void {
-        const addNewEntry = this.action === ModificationKind.Add;
-        this.formGroup = this.formBuilder.group({
-            date: [data.date, [Validators.required, workingDateNotAfter(moment())],
-                addNewEntry && this.dateValidator.validate.bind(this.dateValidator)],
-            startTime: [data.startTime, [Validators.required, Validators.pattern(TIME_FORMAT)]],
-            endTime: [data.endTime, [Validators.required, Validators.pattern(TIME_FORMAT)]],
-            comment: [data.comment]
-        }, {
-            validators: endTimeIsAfterStartTime
-        });
-        if (!addNewEntry) {
-            this.formGroup.get('date')?.disable({onlySelf: true});
-        }
     }
 }
 

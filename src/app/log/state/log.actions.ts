@@ -1,6 +1,5 @@
 import {createAction, props} from '@ngrx/store';
 import {LogEntry} from './log.entry';
-import {DialogEntry} from '../model/dialog-entry.model';
 
 export const loadLogEntries = createAction(
     '[Log Effects] Log Entries Loaded',
@@ -18,16 +17,31 @@ export const deleteLogEntry = createAction(
 );
 
 export const updateLogEntry = createAction(
+    '[Log Entry Log Component] Update Log Entry',
+    props<LogEntry>()
+);
+
+export const triggerLogEntryCreation = createAction(
+    '[Log Entry Dialog Component] Create Log Entry',
+    props<LogEntry>()
+);
+
+export const triggerLogEntryUpdate = createAction(
     '[Log Entry Dialog Component] Update Log Entry',
     props<LogEntry>()
 );
 
-export const processDialogEntry = createAction(
-    '[Log Entry Dialog Component] Process Dialog Entry',
-    props<DialogEntry>()
+export const triggerLogEntryDeletion = createAction(
+    '[Log Entry Dialog Component] Delete Log Entry',
+    props<LogEntry>()
 );
 
 export const storeLogEntryError = createAction(
     '[Log Effects] Error Storing Log Entry',
+    props<{ message: string }>()
+);
+
+export const deleteLogEntryError = createAction(
+    '[Log Effects] Error Deleting Log Entry',
     props<{ message: string }>()
 );
