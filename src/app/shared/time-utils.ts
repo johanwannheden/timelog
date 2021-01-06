@@ -13,7 +13,7 @@ export function isValidFormat(value: string): boolean {
     return !!value && TIME_FORMAT.test(value);
 }
 
-export function getTimeOfDay(value: string): TimeOfDay {
+export function parseTimeOfDay(value: string): TimeOfDay {
     if (!isValidFormat(value)) {
         throw new Error('Invalid time: ' + value);
     }
@@ -94,4 +94,12 @@ export function momentToId(value: Moment): string {
 
 export function idToMoment(value: string): Moment {
     return moment(value);
+}
+
+export function getCurrentYearMonth(): { year: number, month: number } {
+    const m = moment();
+    return {
+        year: m.year(),
+        month: m.month()
+    };
 }

@@ -5,15 +5,16 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {LogEntryComponent} from '../log-entry/log-entry.component';
 import {ModificationKind} from '../model/log-entry.modification';
-import {Store} from '@ngrx/store';
-import {selectLogEntries, selectLogEntryById} from '../state/log.selectors';
+import {createSelector, MemoizedSelector, Store} from '@ngrx/store';
+import {selectLogEntries, selectLogEntryById, selectMonths} from '../state/log.selectors';
 import {map, take, takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {LogEntry} from '../state/log.entry';
 import {triggerLogEntryDeletion} from '../state/log.actions';
-import {SelectMonthComponent, YearMonth} from '../select-month/select-month.component';
-import {selectStatusMessage} from '../../state/status.selectors';
-import {getDurationAsString, getTimeOfDay} from '../../shared/time-utils';
+import {selectSelectedMonth, selectStatusMessage} from '../../state/status.selectors';
+import {getDurationAsString, parseTimeOfDay} from '../../shared/time-utils';
+import * as moment from 'moment';
+import {setSelectedMonth} from '../select-month/select-month.actions';
 
 interface LogEntryWithDuration extends LogEntry {
     duration: string;
@@ -30,6 +31,8 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // @ts-ignore
     error$ = this.store.select(selectStatusMessage);
+    selectedMonths$ = this.store.select(selectMonths);
+    // selectedMonth$: Observable<{ year: number, month: number }> = this.store.select(selectSelectedMonth);
 
     displayedColumns = ['date', 'duration', 'comment', 'update', 'delete'];
     dataSource = new MatTableDataSource<LogEntry>();
@@ -42,11 +45,24 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
     constructor(public dialog: MatDialog, private store: Store) {
     }
 
+    private selectLogEntriesByMonth(monthSelector: MemoizedSelector<object, any>): MemoizedSelector<object, LogEntry[]> {
+        return createSelector(
+            monthSelector,
+            selectLogEntries,
+            (month, entities) => {
+                return entities.filter(e => {
+                    const date = moment(e.date);
+                    return date.year() === month.year && date.month() === month.month;
+                });
+            }
+        );
+    }
+
     ngOnInit(): void {
-        this.store.select(selectLogEntries).pipe(
+        this.store.select(this.selectLogEntriesByMonth(selectSelectedMonth)).pipe(
             map(e => e.map(it => ({
                 ...it,
-                duration: getDurationAsString(getTimeOfDay(it.startTime), getTimeOfDay(it.endTime))
+                duration: getDurationAsString(parseTimeOfDay(it.startTime), parseTimeOfDay(it.endTime))
             }))),
             takeUntil(this.destroy$)
         ).subscribe(entries => {
@@ -61,13 +77,6 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
-    }
-
-    openContextDateSelectionDialog(): void {
-        const dialogRef = this.dialog.open(SelectMonthComponent);
-        dialogRef.afterClosed().subscribe((value: YearMonth) => {
-            console.log('> got', value);
-        });
     }
 
     openLogEntryDialog(kind: ModificationKind, data?: string): void {
@@ -104,5 +113,13 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.store.dispatch(triggerLogEntryDeletion(entry));
                 }
             });
+    }
+
+    monthSelected(value: { year: number, month: number }): void {
+        this.store.dispatch(setSelectedMonth(value));
+    }
+
+    onGenerateClicked(): void {
+        console.log('>> do generate report');
     }
 }

@@ -1,6 +1,7 @@
 import {createFeatureSelector, createSelector} from '@ngrx/store';
 import {logAdapter, LogEntryState} from './log.adapter';
 import {LogEntry} from './log.entry';
+import * as moment from 'moment';
 
 export const selectLogEntryState = createFeatureSelector<LogEntryState>('logEntries');
 
@@ -40,4 +41,18 @@ export const selectLogEntries = createSelector(
 export const selectLogEntryKeys = createSelector(
     selectLogEntryState,
     (logState: LogEntryState) => logState.ids
+);
+
+export const selectMonths = createSelector(
+    selectLogEntries,
+    (entries: LogEntry[]) => {
+        const uniqueStringValues = new Set(entries
+            .map(e => {
+                const date = moment(e.date);
+                return ({year: date.year(), month: date.month()});
+            })
+            .map(o => JSON.stringify(o))
+        );
+        return Array.from(uniqueStringValues).map(o => JSON.parse(o));
+    }
 );

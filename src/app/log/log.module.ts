@@ -22,7 +22,6 @@ import {YearMonthFormatDirective} from './shared/year-month-format.directive';
 import {YearMonthDayFormatDirective} from './shared/year-month-day-format.directive';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
 import {logEntryReducer} from './state/log.reducer';
-import {SelectMonthComponent} from './select-month/select-month.component';
 import {MatCardModule} from '@angular/material/card';
 import {YearMonthPipe} from './select-month/year-month.pipe';
 
@@ -34,7 +33,6 @@ import {YearMonthPipe} from './select-month/year-month.pipe';
         YearMonthPipe,
         YearMonthFormatDirective,
         YearMonthDayFormatDirective,
-        SelectMonthComponent
     ],
     imports: [
         CommonModule,

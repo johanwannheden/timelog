@@ -5,11 +5,20 @@
     <button (click)="openLogEntryDialog(add)" color="primary" mat-icon-button>
         <mat-icon>add</mat-icon>
     </button>
+
     <mat-menu #menu="matMenu">
-        <button mat-menu-item (click)="openContextDateSelectionDialog()">
-            <mat-icon>dialpad</mat-icon>
-            <span>Select month</span>
+        <button mat-menu-item (click)="onGenerateClicked()">
+            <span>Generate </span>
+            <mat-icon>picture_as_pdf</mat-icon>
         </button>
+        <ng-container *ngIf="(selectedMonths$ | async) as allMonths">
+            <button mat-menu-item [mat-menu-trigger-for]="months">Month</button>
+            <mat-menu #months="matMenu">
+                <ng-container *ngFor="let month of allMonths">
+                    <button mat-menu-item (click)="monthSelected(month)">{{month | yearMonth}}</button>
+                </ng-container>
+            </mat-menu>
+        </ng-container>
     </mat-menu>
 </div>
 

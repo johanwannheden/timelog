@@ -1,4 +1,4 @@
-import {DAY_OF_WEEK, getCurrentDayOfWeek, getMinuteOfDay, getTimeOfDay, isValidFormat} from './time-utils';
+import {DAY_OF_WEEK, getCurrentDayOfWeek, getMinuteOfDay, parseTimeOfDay, isValidFormat} from './time-utils';
 
 describe('Tests Time Util Functions', () => {
     describe('Get Current Day of Week', () => {
@@ -31,22 +31,22 @@ describe('Tests Time Util Functions', () => {
     });
     describe('Time of Day', () => {
         it('should handle empty input', () => {
-            expect(() => getTimeOfDay('')).toThrowError();
+            expect(() => parseTimeOfDay('')).toThrowError();
         });
         it('should handle foo input', () => {
-            expect(() => getTimeOfDay('foo')).toThrowError();
+            expect(() => parseTimeOfDay('foo')).toThrowError();
         });
         it('should detect invalid time in valid format', () => {
-            expect(() => getTimeOfDay('25:99')).toThrowError();
+            expect(() => parseTimeOfDay('25:99')).toThrowError();
         });
         it('should calculate correct object for valid time', () => {
-            expect((getTimeOfDay('23:59'))).toEqual({hour: 23, minute: 59});
+            expect((parseTimeOfDay('23:59'))).toEqual({hour: 23, minute: 59});
         });
         it('should calculate correct object for valid time with hour only', () => {
-            expect((getTimeOfDay('23'))).toEqual({hour: 23, minute: 0});
+            expect((parseTimeOfDay('23'))).toEqual({hour: 23, minute: 0});
         });
         it('should calculate correct object for midnight', () => {
-            expect((getTimeOfDay('00'))).toEqual({hour: 0, minute: 0});
+            expect((parseTimeOfDay('00'))).toEqual({hour: 0, minute: 0});
         });
     });
 });

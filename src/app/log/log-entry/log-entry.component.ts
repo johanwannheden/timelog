@@ -3,7 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {LogEntryModification, ModificationKind} from '../model/log-entry.modification';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {endTimeIsAfterStartTime, workingDateNotAfter} from '../../shared/dialog-validators.directive';
-import {getDefaultEndTime, getDefaultStartTime, getTimeOfDay, momentToId, TIME_FORMAT} from '../../shared/time-utils';
+import {getDefaultEndTime, getDefaultStartTime, parseTimeOfDay, momentToId, TIME_FORMAT} from '../../shared/time-utils';
 import {Store} from '@ngrx/store';
 import {LogDateValidator} from './log-date.validator';
 import * as moment from 'moment';
@@ -59,8 +59,8 @@ export class LogEntryComponent implements OnInit {
     private initWithData(data?: LogEntry): void {
         const addNewEntry = !data;
         const date = moment(data?.date);
-        const startTime = data?.startTime ? getTimeOfDay(data.startTime).formatted() : getDefaultStartTime();
-        const endTime = data?.endTime ? getTimeOfDay(data.endTime).formatted() : getDefaultEndTime();
+        const startTime = data?.startTime ? parseTimeOfDay(data.startTime).formatted() : getDefaultStartTime();
+        const endTime = data?.endTime ? parseTimeOfDay(data.endTime).formatted() : getDefaultEndTime();
         const comment = data?.comment;
 
         this.formGroup = this.formBuilder.group({
@@ -84,8 +84,8 @@ export class LogEntryComponent implements OnInit {
             id: this.logEntry?.id,
             date: momentToId(this.formGroup?.get('date')?.value),
             comment: this.formGroup?.get('comment')?.value,
-            startTime: getTimeOfDay(this.formGroup?.get('startTime')?.value).formatted(),
-            endTime: getTimeOfDay(this.formGroup?.get('endTime')?.value).formatted(),
+            startTime: parseTimeOfDay(this.formGroup?.get('startTime')?.value).formatted(),
+            endTime: parseTimeOfDay(this.formGroup?.get('endTime')?.value).formatted(),
             dateAdded: this.logEntry?.dateAdded ?? moment().format('YYYY-MM-DDTHH:mm:ss'),
             dateUpdated: moment().format('YYYY-MM-DDTHH:mm:ss'),
         };
