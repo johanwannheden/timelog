@@ -11,11 +11,13 @@ import {
     triggerLogEntryUpdate,
     updateLogEntry
 } from './log.actions';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, map, mergeMap, switchMap} from 'rxjs/operators';
 import {Store} from '@ngrx/store';
 import {LogEntry} from './log.entry';
-import {of} from 'rxjs';
+import {combineLatest, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
+import {generateReport} from '../log-list/log-list.actions';
+import {selectCurrentUserId, selectSelectedMonth} from '../../state/status.selectors';
 
 // noinspection JSUnusedGlobalSymbols
 @Injectable()
@@ -32,6 +34,36 @@ export class LogEffects {
                 )
             ),
         )
+    );
+
+    triggerReport$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(generateReport),
+            switchMap(() =>
+                combineLatest([this.store.select(selectCurrentUserId), this.store.select(selectSelectedMonth)])
+                    .pipe(
+                        mergeMap(([userId, selectedMonth]) => {
+                                return this.http.get(
+                                    `api/reporting/generate/${selectedMonth.year}/${selectedMonth.month + 1}/${userId}`,
+                                    {responseType: 'blob'})
+                                    .pipe(
+                                        map((blob) => {
+                                            const link = document.createElement('a');
+                                            if (link.download !== undefined) {
+                                                const url = URL.createObjectURL(blob);
+                                                link.setAttribute('href', url);
+                                                link.setAttribute('download', userId + '.pdf');
+                                                link.style.visibility = 'hidden';
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+                                            }
+                                        })
+                                    );
+                            }
+                        )
+                    )
+            )), {dispatch: false}
     );
 
     updateEntry$ = createEffect(() => {

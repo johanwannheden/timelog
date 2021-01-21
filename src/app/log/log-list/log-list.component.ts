@@ -8,13 +8,14 @@ import {ModificationKind} from '../model/log-entry.modification';
 import {createSelector, MemoizedSelector, Store} from '@ngrx/store';
 import {selectLogEntries, selectLogEntryById, selectMonths} from '../state/log.selectors';
 import {map, take, takeUntil} from 'rxjs/operators';
-import {Observable, Subject} from 'rxjs';
+import {Subject} from 'rxjs';
 import {LogEntry} from '../state/log.entry';
 import {triggerLogEntryDeletion} from '../state/log.actions';
 import {selectSelectedMonth, selectStatusMessage} from '../../state/status.selectors';
 import {getDurationAsString, parseTimeOfDay} from '../../shared/time-utils';
 import * as moment from 'moment';
 import {setSelectedMonth} from '../select-month/select-month.actions';
+import {generateReport} from './log-list.actions';
 
 interface LogEntryWithDuration extends LogEntry {
     duration: string;
@@ -62,6 +63,7 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.store.select(this.selectLogEntriesByMonth(selectSelectedMonth)).pipe(
             map(e => e.map(it => ({
                 ...it,
+                userId: 'e3a64823-324c-4aa0-8cff-436fcc9fdcb4', // FIXME do not hard code userId
                 duration: getDurationAsString(parseTimeOfDay(it.startTime), parseTimeOfDay(it.endTime))
             }))),
             takeUntil(this.destroy$)
@@ -120,6 +122,6 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     onGenerateClicked(): void {
-        console.log('>> do generate report');
+        this.store.dispatch(generateReport());
     }
 }

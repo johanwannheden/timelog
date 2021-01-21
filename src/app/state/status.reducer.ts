@@ -5,7 +5,8 @@ import {setSelectedMonth} from '../log/select-month/select-month.actions';
 import {setInitialSelectedMonth} from './status.actions';
 
 export const initialState: StatusState = {
-    message: '<empty>',
+    userId: 'e3a64823-324c-4aa0-8cff-436fcc9fdcb4', // FIXME do not hard code userId
+    message: undefined,
     year: undefined,
     month: undefined,
     loading: false,

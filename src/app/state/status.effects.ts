@@ -12,6 +12,7 @@ export class StatusEffects {
         this.actions$.pipe(
             ofType(ROOT_EFFECTS_INIT),
             switchMap(() =>
+                // TODO alternatively set the month of last log entry
                 of(setInitialSelectedMonth(getCurrentYearMonth()))
             )
         )

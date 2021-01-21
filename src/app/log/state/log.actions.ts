@@ -6,6 +6,11 @@ export const loadLogEntries = createAction(
     props<{ entries: LogEntry[] }>()
 );
 
+export const downloadReport = createAction(
+    '[Log Effects] Download Report',
+    props<{ data: any }>()
+);
+
 export const storeLogEntry = createAction(
     '[Log Entry Dialog Component] Store Log Entry',
     props<LogEntry>()

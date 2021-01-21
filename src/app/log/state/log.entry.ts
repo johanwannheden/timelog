@@ -1,5 +1,6 @@
 export interface LogEntry {
     id?: number;
+    userId?: string;
     date: string;
     dateAdded: string;
     dateUpdated: string;
