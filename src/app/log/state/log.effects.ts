@@ -18,6 +18,8 @@ import {combineLatest, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {generateReport} from '../log-list/log-list.actions';
 import {selectCurrentUserId, selectSelectedMonth} from '../../state/status.selectors';
+import {setInitialSelectedMonth} from '../../state/status.actions';
+import * as moment from 'moment';
 
 // noinspection JSUnusedGlobalSymbols
 @Injectable()
@@ -35,6 +37,19 @@ export class LogEffects {
             ),
         )
     );
+
+    setCurrentMonth$ = createEffect(() => {
+        return this.actions$.pipe(
+            ofType(loadLogEntries),
+            switchMap((data) => {
+                const lastDate = Array.from(data.entries)
+                    .sort((e1, e2) => e1.date.localeCompare(e2.date))
+                    .reduce((e1, e2) => e2).date;
+                const m = moment(lastDate);
+                return of(setInitialSelectedMonth({year: m.year(), month: m.month()}));
+            })
+        );
+    });
 
     triggerReport$ = createEffect(() =>
         this.actions$.pipe(

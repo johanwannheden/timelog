@@ -12,7 +12,6 @@ import {EffectsModule} from '@ngrx/effects';
 import {LogEffects} from './log/state/log.effects';
 import {HttpClientModule} from '@angular/common/http';
 import {appReducer} from './app.reducer';
-import {StatusEffects} from './state/status.effects';
 
 @NgModule({
     declarations: [
@@ -27,7 +26,7 @@ import {StatusEffects} from './state/status.effects';
         AppRoutingModule,
 
         StoreModule.forRoot(appReducer),
-        EffectsModule.forRoot([StatusEffects, LogEffects]),
+        EffectsModule.forRoot([LogEffects]),
         StoreDevtoolsModule.instrument()
     ],
     providers: [

@@ -40,7 +40,7 @@ export const selectLogEntries = createSelector(
 
 export const selectLogEntryKeys = createSelector(
     selectLogEntryState,
-    (logState: LogEntryState) => logState.ids
+    (logState: LogEntryState): string[] => logState.ids
 );
 
 export const selectMonths = createSelector(
