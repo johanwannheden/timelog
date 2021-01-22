@@ -3,7 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {LogEntryModification, ModificationKind} from '../model/log-entry.modification';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {endTimeIsAfterStartTime, workingDateNotAfter} from '../../shared/dialog-validators.directive';
-import {getDefaultEndTime, getDefaultStartTime, parseTimeOfDay, momentToId, TIME_FORMAT} from '../../shared/time-utils';
+import {getDefaultEndTime, getDefaultStartTime, momentToId, parseTimeOfDay, TIME_FORMAT} from '../../shared/time-utils';
 import {Store} from '@ngrx/store';
 import {LogDateValidator} from './log-date.validator';
 import * as moment from 'moment';
@@ -11,6 +11,7 @@ import {selectLogEntries, selectLogEntryById} from '../state/log.selectors';
 import {take} from 'rxjs/operators';
 import {LogEntry} from '../state/log.entry';
 import {triggerLogEntryCreation, triggerLogEntryUpdate} from '../state/log.actions';
+import {selectCurrentUserId} from '../../state/status.selectors';
 
 @Component({
     selector: 'app-create-log-entry',
@@ -28,6 +29,7 @@ export class LogEntryComponent implements OnInit {
     private readonly entryKey: string | undefined;
 
     private logEntry?: LogEntry;
+    private userId?: string;
 
     constructor(
         public dialogRef: MatDialogRef<LogEntryComponent>,
@@ -41,6 +43,9 @@ export class LogEntryComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.store.select(selectCurrentUserId)
+            .pipe(take(1))
+            .subscribe(userId => this.userId = userId);
         if (this.entryKey) {
             this.store.select(selectLogEntryById(this.entryKey))
                 .pipe(take(1))
@@ -54,6 +59,35 @@ export class LogEntryComponent implements OnInit {
         } else {
             this.initWithData();
         }
+    }
+
+    doAction(): void {
+        const createNewLogEntry = this.action === ModificationKind.Add;
+
+        this.logEntry = {
+            id: this.logEntry?.id,
+            date: momentToId(this.formGroup?.get('date')?.value),
+            comment: this.formGroup?.get('comment')?.value,
+            startTime: parseTimeOfDay(this.formGroup?.get('startTime')?.value).formatted(),
+            endTime: parseTimeOfDay(this.formGroup?.get('endTime')?.value).formatted(),
+            dateAdded: this.logEntry?.dateAdded ?? moment().format('YYYY-MM-DDTHH:mm:ss'),
+            dateUpdated: moment().format('YYYY-MM-DDTHH:mm:ss'),
+            userId: this.userId
+        };
+
+        if (createNewLogEntry) {
+            this.store.dispatch(triggerLogEntryCreation(this.logEntry));
+        } else {
+            this.store.dispatch(triggerLogEntryUpdate(this.logEntry));
+        }
+
+        // TODO should not close dialog itself, should not concern with dialog
+        //  use @Output instead?
+        this.dialogRef.close(undefined);
+    }
+
+    closeDialog(): void {
+        this.dialogRef.close(undefined);
     }
 
     private initWithData(data?: LogEntry): void {
@@ -75,34 +109,6 @@ export class LogEntryComponent implements OnInit {
         if (!addNewEntry) {
             this.formGroup.get('date')?.disable({onlySelf: true});
         }
-    }
-
-    doAction(): void {
-        const createNewLogEntry = this.action === ModificationKind.Add;
-
-        this.logEntry = {
-            id: this.logEntry?.id,
-            date: momentToId(this.formGroup?.get('date')?.value),
-            comment: this.formGroup?.get('comment')?.value,
-            startTime: parseTimeOfDay(this.formGroup?.get('startTime')?.value).formatted(),
-            endTime: parseTimeOfDay(this.formGroup?.get('endTime')?.value).formatted(),
-            dateAdded: this.logEntry?.dateAdded ?? moment().format('YYYY-MM-DDTHH:mm:ss'),
-            dateUpdated: moment().format('YYYY-MM-DDTHH:mm:ss'),
-        };
-
-        if (createNewLogEntry) {
-            this.store.dispatch(triggerLogEntryCreation(this.logEntry));
-        } else {
-            this.store.dispatch(triggerLogEntryUpdate(this.logEntry));
-        }
-
-        // TODO should not close dialog itself, should not concern with dialog
-        //  use @Output instead?
-        this.dialogRef.close(undefined);
-    }
-
-    closeDialog(): void {
-        this.dialogRef.close(undefined);
     }
 }
 

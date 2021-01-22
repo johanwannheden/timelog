@@ -11,7 +11,7 @@ import {
     triggerLogEntryUpdate,
     updateLogEntry
 } from './log.actions';
-import {catchError, map, mergeMap, switchMap} from 'rxjs/operators';
+import {catchError, map, mergeMap, switchMap, take} from 'rxjs/operators';
 import {Store} from '@ngrx/store';
 import {LogEntry} from './log.entry';
 import {combineLatest, of} from 'rxjs';
@@ -57,6 +57,7 @@ export class LogEffects {
             switchMap(() =>
                 combineLatest([this.store.select(selectCurrentUserId), this.store.select(selectSelectedMonth)])
                     .pipe(
+                        take(1),
                         mergeMap(([userId, selectedMonth]) => {
                                 return this.http.get(
                                     `api/reporting/generate/${selectedMonth.year}/${selectedMonth.month + 1}/${userId}`,
