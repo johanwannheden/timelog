@@ -33,6 +33,7 @@ export const selectLogEntries = createSelector(
                 comment: entry.comment,
                 dateAdded: entry.dateAdded,
                 dateUpdated: entry.dateUpdated,
+                userId: entry.userId
             }) as LogEntry;
         });
     }

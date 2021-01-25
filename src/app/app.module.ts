@@ -10,8 +10,10 @@ import {RouterModule} from '@angular/router';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {EffectsModule} from '@ngrx/effects';
 import {LogEffects} from './log/state/log.effects';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {appReducer} from './app.reducer';
+import {UserIdHttpInterceptorService} from './shared/user-id-http-interceptor.service';
+import {StatusEffects} from './state/status.effects';
 
 @NgModule({
     declarations: [
@@ -26,11 +28,12 @@ import {appReducer} from './app.reducer';
         AppRoutingModule,
 
         StoreModule.forRoot(appReducer),
-        EffectsModule.forRoot([LogEffects]),
+        EffectsModule.forRoot([StatusEffects, LogEffects]),
         StoreDevtoolsModule.instrument()
     ],
     providers: [
         {provide: MAT_DATE_LOCALE, useValue: 'de-CH'},
+        { provide: HTTP_INTERCEPTORS, useClass: UserIdHttpInterceptorService, multi: true },
     ],
     bootstrap: [AppComponent]
 })

@@ -46,6 +46,11 @@ export const storeLogEntryError = createAction(
     props<{ message: string }>()
 );
 
+export const generateReportResult = createAction(
+    '[Log Effects] Generating Report Result',
+    props<{ message?: string }>()
+);
+
 export const deleteLogEntryError = createAction(
     '[Log Effects] Error Deleting Log Entry',
     props<{ message: string }>()

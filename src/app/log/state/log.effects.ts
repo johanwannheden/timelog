@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {
     deleteLogEntry,
     deleteLogEntryError,
+    generateReportResult,
     loadLogEntries,
     storeLogEntry,
     storeLogEntryError,
@@ -11,10 +12,10 @@ import {
     triggerLogEntryUpdate,
     updateLogEntry
 } from './log.actions';
-import {catchError, map, mergeMap, switchMap, take} from 'rxjs/operators';
+import {catchError, filter, map, mergeMap, switchMap, take} from 'rxjs/operators';
 import {Store} from '@ngrx/store';
 import {LogEntry} from './log.entry';
-import {combineLatest, of} from 'rxjs';
+import {of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {generateReport} from '../log-list/log-list.actions';
 import {selectCurrentUserId, selectSelectedMonth} from '../../state/status.selectors';
@@ -29,11 +30,15 @@ export class LogEffects {
         this.actions$.pipe(
             ofType(ROOT_EFFECTS_INIT),
             switchMap(() =>
-                this.http.get('api/timelog/all').pipe(
-                    map((data) => loadLogEntries({
-                        entries: data as LogEntry[]
-                    }))
-                )
+                this.store.select(selectCurrentUserId)
+                    .pipe(
+                        filter(Boolean),
+                        mergeMap(() => this.http.get(`api/timelog/all`).pipe(
+                            map((data) => loadLogEntries({
+                                entries: data as LogEntry[]
+                            }))
+                        ))
+                    )
             ),
         )
     );
@@ -55,12 +60,12 @@ export class LogEffects {
         this.actions$.pipe(
             ofType(generateReport),
             switchMap(() =>
-                combineLatest([this.store.select(selectCurrentUserId), this.store.select(selectSelectedMonth)])
+                this.store.select(selectSelectedMonth)
                     .pipe(
                         take(1),
-                        mergeMap(([userId, selectedMonth]) => {
+                        mergeMap((selectedMonth) => {
                                 return this.http.get(
-                                    `api/reporting/generate/${selectedMonth.year}/${selectedMonth.month + 1}/${userId}`,
+                                    `api/reporting/generate/${selectedMonth.year}/${selectedMonth.month + 1}`,
                                     {responseType: 'blob'})
                                     .pipe(
                                         map((blob) => {
@@ -68,18 +73,20 @@ export class LogEffects {
                                             if (link.download !== undefined) {
                                                 const url = URL.createObjectURL(blob);
                                                 link.setAttribute('href', url);
-                                                link.setAttribute('download', userId + '.pdf');
+                                                link.setAttribute('download', 'report.pdf');
                                                 link.style.visibility = 'hidden';
                                                 document.body.appendChild(link);
                                                 link.click();
                                                 document.body.removeChild(link);
                                             }
-                                        })
+                                            return generateReportResult({});
+                                        }),
+                                        catchError((data) => of(generateReportResult({message: data.message})))
                                     );
                             }
                         )
                     )
-            )), {dispatch: false}
+            ))
     );
 
     updateEntry$ = createEffect(() => {

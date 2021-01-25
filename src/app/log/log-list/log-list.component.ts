@@ -63,7 +63,6 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.store.select(this.selectLogEntriesByMonth(selectSelectedMonth)).pipe(
             map(e => e.map(it => ({
                 ...it,
-                userId: 'e3a64823-324c-4aa0-8cff-436fcc9fdcb4', // FIXME do not hard code userId
                 duration: getDurationAsString(parseTimeOfDay(it.startTime), parseTimeOfDay(it.endTime))
             }))),
             takeUntil(this.destroy$)
