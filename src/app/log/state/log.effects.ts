@@ -21,6 +21,7 @@ import {generateReport} from '../log-list/log-list.actions';
 import {selectCurrentUserId, selectSelectedMonth} from '../../state/status.selectors';
 import {setInitialSelectedMonth} from '../../state/status.actions';
 import * as moment from 'moment';
+import {environment} from '../../../environments/environment';
 
 // noinspection JSUnusedGlobalSymbols
 @Injectable()
@@ -33,7 +34,7 @@ export class LogEffects {
                 this.store.select(selectCurrentUserId)
                     .pipe(
                         filter(Boolean),
-                        mergeMap(() => this.http.get(`api/timelog/all`).pipe(
+                        mergeMap(() => this.http.get(environment.server.url + `/api/timelog/all`).pipe(
                             map((data) => loadLogEntries({
                                 entries: data as LogEntry[]
                             }))
@@ -65,7 +66,7 @@ export class LogEffects {
                         take(1),
                         mergeMap((selectedMonth) => {
                                 return this.http.get(
-                                    `api/reporting/generate/${selectedMonth.year}/${selectedMonth.month + 1}`,
+                                    environment.server.url + `/api/reporting/generate/${selectedMonth.year}/${selectedMonth.month + 1}`,
                                     {responseType: 'blob'})
                                     .pipe(
                                         map((blob) => {
@@ -93,7 +94,7 @@ export class LogEffects {
             return this.actions$.pipe(
                 ofType(triggerLogEntryUpdate),
                 switchMap((action: LogEntry) => {
-                    return this.http.post(`api/timelog/update/${action.id}`, action).pipe(
+                    return this.http.post(environment.server.url + `/api/timelog/update/${action.id}`, action).pipe(
                         map(() => updateLogEntry(action)),
                         catchError((data) => of(storeLogEntryError({message: data.message})))
                     );
@@ -106,7 +107,7 @@ export class LogEffects {
             return this.actions$.pipe(
                 ofType(triggerLogEntryCreation),
                 switchMap((action: LogEntry) => {
-                    return this.http.put<LogEntry>('api/timelog/create', action).pipe(
+                    return this.http.put<LogEntry>(environment.server.url + '/api/timelog/create', action).pipe(
                         map((result) => storeLogEntry(result)),
                         catchError((data) => of(storeLogEntryError({message: data.message})))
                     );
@@ -119,7 +120,7 @@ export class LogEffects {
             return this.actions$.pipe(
                 ofType(triggerLogEntryDeletion),
                 switchMap((action: LogEntry) => {
-                    return this.http.delete(`api/timelog/delete/${action.id}`).pipe(
+                    return this.http.delete(environment.server.url + `/api/timelog/delete/${action.id}`).pipe(
                         map(() => deleteLogEntry(action)),
                         catchError((data) => of(deleteLogEntryError({message: data.message})))
                     );

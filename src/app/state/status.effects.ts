@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {map, switchMap} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {setCurrentUserId} from './status.actions';
+import {environment} from '../../environments/environment';
 
 // noinspection JSUnusedGlobalSymbols
 @Injectable()
@@ -12,7 +13,7 @@ export class StatusEffects {
         this.actions$.pipe(
             ofType(ROOT_EFFECTS_INIT),
             switchMap(() =>
-                this.http.get('api/user/currentUserId', {responseType: 'text'}).pipe(
+                this.http.get(environment.server.url + '/api/user/currentUserId', {responseType: 'text'}).pipe(
                     map((data) => {
                         return setCurrentUserId({
                             data: data as string
