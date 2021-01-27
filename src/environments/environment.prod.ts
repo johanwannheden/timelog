@@ -1,5 +1,5 @@
 export const environment = {
-  production: false,
+  production: true,
   server: {
     url: 'http://diskstation.local:8080'
   }
