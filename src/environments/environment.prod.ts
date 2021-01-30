@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
   server: {
-    url: 'http://diskstation.local:8080'
+    url: 'http://falabella.synology.me:9180'
   }
 };
