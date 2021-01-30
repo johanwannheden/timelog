@@ -1,21 +1,30 @@
-<h1 mat-dialog-title>Log Entry {{((logEntries$ | async) || []).length + 1}}</h1>
 <ng-container *ngIf="formGroup as fg">
-    <form [formGroup]="fg">
+    <form [formGroup]="fg" fxLayout="column">
         <mat-form-field appYearMonthDayFormat>
             <input [matDatepicker]="picker" formControlName='date' matInput placeholder="Date">
             <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
-            <mat-error *ngIf="formGroup.get('date')?.errors?.dateInFuture">Date must not be in the future</mat-error>
-            <mat-error *ngIf="formGroup.get('date')?.errors?.duplicateDateEntry">Entry for date already exists</mat-error>
+            <mat-error *ngIf="formGroup.get('date')?.errors?.dateInFuture">Date must not be in the future
+            </mat-error>
+            <mat-error *ngIf="formGroup.get('date')?.errors?.duplicateDateEntry">Entry for date already exists
+            </mat-error>
         </mat-form-field>
         <mat-form-field>
             <input formControlName='startTime' matInput placeholder="Start time">
             <mat-error *ngIf="formGroup.get('startTime')?.invalid">Invalid start time</mat-error>
+            <mat-hint>08:00</mat-hint>
         </mat-form-field>
         <mat-form-field>
             <input formControlName='endTime' matInput placeholder="End time">
             <mat-error *ngIf="formGroup.get('endTime')?.invalid">Invalid end time</mat-error>
+            <mat-hint>17:00</mat-hint>
         </mat-form-field>
+        <mat-form-field>
+            <textarea formControlName='comment' matInput></textarea>
+            <mat-label>Comment</mat-label>
+        </mat-form-field>
+        <mat-error *ngIf="formGroup?.errors?.entryIsReadOnly">Entry is read-only
+        </mat-error>
         <mat-error *ngIf="
             formGroup.get('startTime')?.valid &&
             formGroup.get('endTime')?.valid &&
@@ -23,13 +32,9 @@
             formGroup.invalid">
             Start time is before end time
         </mat-error>
-        <mat-form-field>
-            <textarea formControlName='comment' matInput placeholder="Comment"></textarea>
-        </mat-form-field>
+        <mat-list>
+            <button [disabled]="formGroup.invalid" color="primary" (click)="onAddClicked()">Add</button>
+            <button (click)="onCancelClicked()">Cancel</button>
+        </mat-list>
     </form>
-    <div mat-dialog-actions>
-        <button (click)="doAction()" [disabled]="!fg.valid" color="primary" mat-button
-                mat-flat-button>{{action}}</button>
-        <button (click)="closeDialog()" color="warn" mat-button mat-flat-button>Cancel</button>
-    </div>
 </ng-container>

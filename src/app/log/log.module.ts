@@ -1,5 +1,4 @@
 import {NgModule} from '@angular/core';
-import {LogEntryComponent} from './log-entry/log-entry.component';
 import {LogListComponent} from './log-list/log-list.component';
 import {LogRoutingModule} from './log-routing.module';
 import {CommonModule} from '@angular/common';
@@ -18,23 +17,23 @@ import {FlexLayoutModule} from '@angular/flex-layout';
 import {LogDurationPipe} from './pipe/log-duration.pipe';
 import {StoreModule} from '@ngrx/store';
 import {RouterModule} from '@angular/router';
-import {YearMonthFormatDirective} from './shared/year-month-format.directive';
-import {YearMonthDayFormatDirective} from './shared/year-month-day-format.directive';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
 import {logEntryReducer} from './state/log.reducer';
 import {MatCardModule} from '@angular/material/card';
-import {YearMonthPipe} from './select-month/year-month.pipe';
+import {MatDialogModule} from '@angular/material/dialog';
+import {LogEntryComponent} from './log-entry/log-entry.component';
+import {SharedModule} from '../shared/shared.module';
+import {MatExpansionModule} from '@angular/material/expansion';
 
 @NgModule({
     declarations: [
-        LogEntryComponent,
         LogListComponent,
         LogDurationPipe,
-        YearMonthPipe,
-        YearMonthFormatDirective,
-        YearMonthDayFormatDirective,
+        LogEntryComponent,
     ],
     imports: [
+        SharedModule,
+
         CommonModule,
         LogRoutingModule,
         ReactiveFormsModule,
@@ -59,10 +58,8 @@ import {YearMonthPipe} from './select-month/year-month.pipe';
         MatPaginatorModule,
         MatDatepickerModule,
         MatCardModule,
-    ],
-    exports: [
-        YearMonthFormatDirective,
-        YearMonthDayFormatDirective
+        MatDialogModule,
+        MatExpansionModule,
     ],
 })
 export class LogModule {

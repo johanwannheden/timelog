@@ -1,0 +1,24 @@
+<mat-toolbar fxLayout>
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
+    </button>
+    <button color="primary" mat-icon-button (click)="openAddButtonClicked()">
+        <mat-icon>add</mat-icon>
+    </button>
+
+    <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="onGenerateClicked()">
+            <span>Generate </span>
+            <mat-icon>picture_as_pdf</mat-icon>
+        </button>
+        <ng-container *ngIf="(selectedMonths$ | async) as allMonths">
+            <button mat-menu-item [mat-menu-trigger-for]="months">Month</button>
+            <mat-menu #months="matMenu">
+                <ng-container *ngFor="let month of allMonths">
+                    <button mat-menu-item (click)="onMonthSelected(month)">{{month | yearMonth}}</button>
+                </ng-container>
+            </mat-menu>
+        </ng-container>
+    </mat-menu>
+</mat-toolbar>
+

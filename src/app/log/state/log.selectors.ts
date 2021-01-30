@@ -12,9 +12,9 @@ export const {
     selectTotal
 } = logAdapter.getSelectors();
 
-export const selectLogEntryById = (logEntryId: string) => createSelector(
+export const selectLogEntryById = (id: number) => createSelector(
     selectLogEntryState,
-    logEntryState => logEntryState.entities[logEntryId]
+    logEntryState => Object.values(logEntryState.entities).find(e => e?.id === id)
 );
 
 export const selectLogEntries = createSelector(
@@ -27,6 +27,7 @@ export const selectLogEntries = createSelector(
             // tslint:disable-next-line:no-non-null-assertion
             const entry = it!;
             return ({
+                id: entry.id,
                 date: entry.date,
                 startTime: entry.startTime,
                 endTime: entry.endTime,

@@ -1,114 +1,135 @@
-import {ChangeDetectionStrategy, Component, Inject, OnInit, Optional} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {LogEntryModification, ModificationKind} from '../model/log-entry.modification';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {map, take, takeUntil} from 'rxjs/operators';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {endTimeIsAfterStartTime, workingDateNotAfter} from '../../shared/dialog-validators.directive';
-import {getDefaultEndTime, getDefaultStartTime, momentToId, parseTimeOfDay, TIME_FORMAT} from '../../shared/time-utils';
-import {Store} from '@ngrx/store';
-import {LogDateValidator} from './log-date.validator';
-import * as moment from 'moment';
-import {selectLogEntries, selectLogEntryById} from '../state/log.selectors';
-import {take} from 'rxjs/operators';
-import {LogEntry} from '../state/log.entry';
-import {triggerLogEntryCreation, triggerLogEntryUpdate} from '../state/log.actions';
 import {selectCurrentUserId} from '../../state/status.selectors';
+import {Store} from '@ngrx/store';
+import {endTimeIsAfterStartTime, LogDateValidator} from './log-date.validator';
+import {combineLatest, Subject} from 'rxjs';
+import {ModificationKind} from '../../model/log-entry.modification';
+import {selectLogEntries, selectLogEntryById} from '../state/log.selectors';
+import {LogEntry} from '../state/log.entry';
+import * as moment from 'moment';
+import {getDefaultEndTime, getDefaultStartTime, momentToId, parseTimeOfDay, TIME_FORMAT} from '../../shared/time-utils';
+import {triggerLogEntryCreation, triggerLogEntryUpdate} from '../state/log.actions';
 
 @Component({
-    selector: 'app-create-log-entry',
-    templateUrl:
-        './log-entry.component.html',
-    styleUrls: ['./log-entry.component.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-log-entry',
+    templateUrl: './log-entry.component.html',
+    providers: [LogDateValidator],
+    styleUrls: ['./log-entry.component.css']
 })
-export class LogEntryComponent implements OnInit {
+export class LogEntryComponent implements OnInit, OnDestroy {
 
     formGroup: FormGroup | undefined;
 
-    logEntries$ = this.store.select(selectLogEntries);
-    readonly action: ModificationKind;
-    private readonly entryKey: string | undefined;
+    private action: ModificationKind | undefined;
+    private id: number | undefined;
+    private userId: string | undefined;
+    private entry: LogEntry | undefined;
 
-    private logEntry?: LogEntry;
-    private userId?: string;
+    private destroy$ = new Subject();
 
     constructor(
-        public dialogRef: MatDialogRef<LogEntryComponent>,
-        @Optional() @Inject(MAT_DIALOG_DATA) modification: LogEntryModification,
+        private route: ActivatedRoute,
+        private router: Router,
         private formBuilder: FormBuilder,
         private store: Store,
-        private dateValidator: LogDateValidator
+        private validators: LogDateValidator
     ) {
-        this.entryKey = modification.data;
-        this.action = modification.kind;
+        combineLatest([
+            route.queryParams,
+            this.store.select(selectCurrentUserId)
+        ]).pipe(
+            map(([params, userId]) => {
+                this.action = params.action;
+                this.id = Number(params.id);
+                this.userId = userId;
+                this.init();
+            }),
+            take(1)
+        ).subscribe();
     }
 
     ngOnInit(): void {
-        this.store.select(selectCurrentUserId)
-            .pipe(take(1))
-            .subscribe(userId => this.userId = userId);
-        if (this.entryKey) {
-            this.store.select(selectLogEntryById(this.entryKey))
+        this.store.select(selectLogEntries)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(() => {
+                const date = this.formGroup?.get('date');
+                if (date) {
+                    // handle initial enablement of Add button; must trigger validator
+                    // before any control has been changed by the user
+                    date.updateValueAndValidity();
+                }
+            });
+    }
+
+    init(): void {
+        if (this.id) {
+            this.store.select(selectLogEntryById(this.id))
                 .pipe(take(1))
                 .subscribe(it => {
-                        if (it) {
-                            this.logEntry = it;
-                            this.initWithData(it);
-                        }
-                    },
-                    error => console.log('Error: ' + error));
+                    this.entry = it;
+                    this.initWithData();
+                });
         } else {
             this.initWithData();
         }
     }
 
-    doAction(): void {
+    onAddClicked(): void {
         const createNewLogEntry = this.action === ModificationKind.Add;
 
-        this.logEntry = {
-            id: this.logEntry?.id,
+        const logEntry = {
+            id: this.id,
             date: momentToId(this.formGroup?.get('date')?.value),
             comment: this.formGroup?.get('comment')?.value,
             startTime: parseTimeOfDay(this.formGroup?.get('startTime')?.value).formatted(),
             endTime: parseTimeOfDay(this.formGroup?.get('endTime')?.value).formatted(),
-            dateAdded: this.logEntry?.dateAdded ?? moment().format('YYYY-MM-DDTHH:mm:ss'),
+            dateAdded: this.entry?.dateAdded ?? moment().format('YYYY-MM-DDTHH:mm:ss'),
             dateUpdated: moment().format('YYYY-MM-DDTHH:mm:ss'),
             userId: this.userId
         };
 
         if (createNewLogEntry) {
-            this.store.dispatch(triggerLogEntryCreation(this.logEntry));
+            this.store.dispatch(triggerLogEntryCreation(logEntry));
         } else {
-            this.store.dispatch(triggerLogEntryUpdate(this.logEntry));
+            this.store.dispatch(triggerLogEntryUpdate(logEntry));
         }
-
-        // TODO should not close dialog itself, should not concern with dialog
-        //  use @Output instead?
-        this.dialogRef.close(undefined);
+        this.router.navigateByUrl('log/list');
     }
 
-    closeDialog(): void {
-        this.dialogRef.close(undefined);
+    onCancelClicked(): void {
+        this.router.navigateByUrl('log/list');
     }
 
-    private initWithData(data?: LogEntry): void {
-        const addNewEntry = !data;
-        const date = moment(data?.date);
-        const startTime = data?.startTime ? parseTimeOfDay(data.startTime).formatted() : getDefaultStartTime();
-        const endTime = data?.endTime ? parseTimeOfDay(data.endTime).formatted() : getDefaultEndTime();
-        const comment = data?.comment;
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    private initWithData(): void {
+        const addNewEntry = !this.entry;
+        const date = moment(this.entry?.date);
+        const startTime = this.entry?.startTime ? parseTimeOfDay(this.entry.startTime).formatted() : getDefaultStartTime();
+        const endTime = this.entry?.endTime ? parseTimeOfDay(this.entry.endTime).formatted() : getDefaultEndTime();
+        const comment = this.entry?.comment;
 
         this.formGroup = this.formBuilder.group({
-            date: [date, [Validators.required, workingDateNotAfter(moment())],
-                addNewEntry && this.dateValidator.validate.bind(this.dateValidator)],
+            date: [
+                date,
+                [Validators.required],
+                [this.validators.duplicateLogEntry]
+            ],
             startTime: [startTime, [Validators.required, Validators.pattern(TIME_FORMAT)]],
             endTime: [endTime, [Validators.required, Validators.pattern(TIME_FORMAT)]],
             comment: [comment]
         }, {
-            validators: endTimeIsAfterStartTime
+            validators: endTimeIsAfterStartTime,
+            asyncValidators: this.validators.entryOfCurrentMonth
         });
         if (!addNewEntry) {
             this.formGroup.get('date')?.disable({onlySelf: true});
         }
     }
 }
-

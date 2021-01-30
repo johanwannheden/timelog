@@ -1,7 +1,7 @@
 import {createReducer, on} from '@ngrx/store';
 import {deleteLogEntryError, generateReportResult, storeLogEntry, storeLogEntryError} from '../log/state/log.actions';
 import {StatusState} from './status.selectors';
-import {setSelectedMonth} from '../log/select-month/select-month.actions';
+import {setSelectedMonth} from '../shared/select-month.actions';
 import {setCurrentUserId, setInitialSelectedMonth} from './status.actions';
 
 export const initialState: StatusState = {

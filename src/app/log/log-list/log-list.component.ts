@@ -3,23 +3,19 @@ import {MatTableDataSource} from '@angular/material/table';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
-import {LogEntryComponent} from '../log-entry/log-entry.component';
-import {ModificationKind} from '../model/log-entry.modification';
+import {ModificationKind} from '../../model/log-entry.modification';
 import {createSelector, MemoizedSelector, Store} from '@ngrx/store';
-import {selectLogEntries, selectLogEntryById, selectMonths} from '../state/log.selectors';
-import {map, take, takeUntil} from 'rxjs/operators';
+import {selectLogEntries} from '../state/log.selectors';
+import {map, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {LogEntry} from '../state/log.entry';
 import {triggerLogEntryDeletion} from '../state/log.actions';
 import {selectSelectedMonth, selectStatusMessage} from '../../state/status.selectors';
 import {getDurationAsString, parseTimeOfDay} from '../../shared/time-utils';
 import * as moment from 'moment';
-import {setSelectedMonth} from '../select-month/select-month.actions';
+import {setSelectedMonth} from '../../shared/select-month.actions';
 import {generateReport} from './log-list.actions';
-
-interface LogEntryWithDuration extends LogEntry {
-    duration: string;
-}
+import {Router} from '@angular/router';
 
 @Component({
     selector: 'app-log-list-component',
@@ -32,8 +28,6 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // @ts-ignore
     error$ = this.store.select(selectStatusMessage);
-    selectedMonths$ = this.store.select(selectMonths);
-    // selectedMonth$: Observable<{ year: number, month: number }> = this.store.select(selectSelectedMonth);
 
     displayedColumns = ['date', 'duration', 'comment', 'update', 'delete'];
     dataSource = new MatTableDataSource<LogEntry>();
@@ -43,7 +37,7 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild(MatPaginator) paginator: MatPaginator;
     private destroy$ = new Subject();
 
-    constructor(public dialog: MatDialog, private store: Store) {
+    constructor(public dialog: MatDialog, private store: Store, private router: Router) {
     }
 
     private selectLogEntriesByMonth(monthSelector: MemoizedSelector<object, any>): MemoizedSelector<object, LogEntry[]> {
@@ -61,9 +55,9 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     ngOnInit(): void {
         this.store.select(this.selectLogEntriesByMonth(selectSelectedMonth)).pipe(
-            map(e => e.map(it => ({
-                ...it,
-                duration: getDurationAsString(parseTimeOfDay(it.startTime), parseTimeOfDay(it.endTime))
+            map((entries) => entries.map(e => ({
+                ...e,
+                duration: getDurationAsString(parseTimeOfDay(e.startTime), parseTimeOfDay(e.endTime))
             }))),
             takeUntil(this.destroy$)
         ).subscribe(entries => {
@@ -78,13 +72,6 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
-    }
-
-    openLogEntryDialog(kind: ModificationKind, data?: string): void {
-        this.dialog.open(LogEntryComponent, {
-            width: '250px',
-            data: {kind, data}
-        });
     }
 
     ngAfterViewInit(): void {
@@ -103,17 +90,17 @@ export class LogListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     redirectToUpdate(date: string): void {
-        this.openLogEntryDialog(ModificationKind.Update, date);
+        const entry = this.dataSource.data.find(it => it.date === date);
+        if (entry?.id) {
+            this.router.navigate(['log/entry'], {queryParams: {id: entry.id, action: ModificationKind.Update}});
+        }
     }
 
     redirectToDelete(date: string): void {
-        this.store.select(selectLogEntryById(date))
-            .pipe(take(1))
-            .subscribe((entry) => {
-                if (entry) {
-                    this.store.dispatch(triggerLogEntryDeletion(entry));
-                }
-            });
+        const entry = this.dataSource.data.find(it => it.date === date);
+        if (entry?.id) {
+            this.store.dispatch(triggerLogEntryDeletion(entry));
+        }
     }
 
     monthSelected(value: { year: number, month: number }): void {

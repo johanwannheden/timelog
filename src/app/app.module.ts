@@ -14,10 +14,13 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {appReducer} from './app.reducer';
 import {UserIdHttpInterceptorService} from './shared/user-id-http-interceptor.service';
 import {StatusEffects} from './state/status.effects';
+import {ToolbarComponent} from './toolbar/toolbar.component';
+import {SharedModule} from './shared/shared.module';
 
 @NgModule({
     declarations: [
         AppComponent,
+        ToolbarComponent,
     ],
     imports: [
         HttpClientModule,
@@ -25,15 +28,17 @@ import {StatusEffects} from './state/status.effects';
         BrowserModule,
         RouterModule,
 
+        SharedModule,
+
         AppRoutingModule,
 
         StoreModule.forRoot(appReducer),
         EffectsModule.forRoot([StatusEffects, LogEffects]),
-        StoreDevtoolsModule.instrument()
+        StoreDevtoolsModule.instrument(),
     ],
     providers: [
         {provide: MAT_DATE_LOCALE, useValue: 'de-CH'},
-        { provide: HTTP_INTERCEPTORS, useClass: UserIdHttpInterceptorService, multi: true },
+        {provide: HTTP_INTERCEPTORS, useClass: UserIdHttpInterceptorService, multi: true},
     ],
     bootstrap: [AppComponent]
 })
