@@ -18,6 +18,10 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 Run `docker build -t johanwannheden/timelog:latest .` from the command line in the root directory.
 
+## Push Docker image
+
+Run `docker push johanwannheden/timelog:latest` from the command line in the root directory.
+
 ## Running unit tests
 
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
