@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
   server: {
-    url: 'http://falabella.synology.me:9180'
+    url: 'https://falabella.synology.me:9180'
   }
 };
